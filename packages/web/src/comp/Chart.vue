@@ -15,6 +15,7 @@ import {
   cbslSeries,
   clearPicks,
   icon,
+  kind,
   mkt,
   mode,
   picked,
@@ -50,7 +51,9 @@ const data = computed(() => toPoints(bestSeries.value))
 const refData = computed(() => toPoints(cbslSeries.value))
 
 const lede = computed(() =>
-  mode.value === 'buy'
+  kind.value === 'card'
+    ? 'The lowest estimated landed cost for a USD card purchase, day by day.'
+    : mode.value === 'buy'
     ? 'The lowest price anyone was selling dollars at, day by day.'
     : 'The highest price anyone was buying dollars at, day by day.',
 )

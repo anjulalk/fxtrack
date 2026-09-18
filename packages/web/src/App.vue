@@ -21,20 +21,25 @@ const MODES = [
 ] as const
 
 const KINDS = [
-  { id: 'tt', label: 'Wire / transfer' },
-  { id: 'note', label: 'Cash notes' },
+  { id: 'tt', label: 'Wire / transfer', buyOnly: false },
+  { id: 'note', label: 'Cash notes', buyOnly: false },
+  { id: 'card', label: 'Card payment', buyOnly: true },
 ] as const
+
+const kinds = computed(() => KINDS.filter((k) => !k.buyOnly || mode.value === 'buy'))
 
 const stamp = computed(() => {
   const t = latest.value?.gen
   return t ? clock(t) : null
 })
 
-const note = computed(() =>
-  kind.value === 'tt'
-    ? 'Telegraphic transfers and inward remittances. Banks almost always price these better than physical currency.'
-    : 'Physical notes over the counter. Expect a wider spread than a wire for the same day.',
-)
+const NOTES: Record<string, string> = {
+  tt: 'Telegraphic transfers and inward remittances. Banks almost always price these better than physical currency.',
+  note: 'Physical notes over the counter. Expect a wider spread than a wire for the same day.',
+  card: 'Paying a foreign merchant with a Sri Lankan card. The rate below is an estimate with the typical issuer markup included.',
+}
+
+const note = computed(() => NOTES[kind.value]!)
 
 onMounted(load)
 </script>
@@ -89,7 +94,7 @@ onMounted(load)
     <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
       <div class="flex rounded-lg border border-line bg-wash p-0.5">
         <button
-          v-for="k in KINDS"
+          v-for="k in kinds"
           :key="k.id"
           type="button"
           class="ui rounded-md px-3 py-1.5 text-xs font-medium transition"
@@ -151,10 +156,20 @@ onMounted(load)
         </div>
         <div>
           <h2 class="label text-faint">Before you transact</h2>
-          <p class="mt-2">
+          <p v-if="kind !== 'card'" class="mt-2">
             Published rates are indicative. Counter and branch rates move during the day, large
             amounts are often negotiable, and fees are not included here. Confirm with the bank
             before committing.
+          </p>
+          <p v-else class="mt-2">
+            Card estimates add a 4% issuer markup, the median of published figures in official
+            <a class="underline underline-offset-2 hover:text-ink" href="https://www.boc.lk/rates-tariff" target="_blank" rel="noreferrer">BOC</a>,
+            <a class="underline underline-offset-2 hover:text-ink" href="https://www.combank.lk/rates-tariff" target="_blank" rel="noreferrer">Commercial Bank</a>,
+            <a class="underline underline-offset-2 hover:text-ink" href="https://www.seylan.lk/service-charges" target="_blank" rel="noreferrer">Seylan</a>,
+            <a class="underline underline-offset-2 hover:text-ink" href="https://dfccwebstoacc.blob.core.windows.net/dfccweb/uploads/db368b5b-842a-4ba3-9593-12b479d4d4c8/DFCC-Bank-PLC-Tariff-2025-Version-3.0-1.pdf" target="_blank" rel="noreferrer">DFCC</a>
+            and People's Bank tariffs. No separate network fee, VAT, SSCL or verified stamp-duty
+            line is included. Choose USD at checkout: DCC is a separate fee when a merchant bills
+            you in LKR.
           </p>
         </div>
       </div>

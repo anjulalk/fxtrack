@@ -32,7 +32,9 @@ const list = (a: string[]) => LIST.format(a)
 const cbsl = computed(() => latest.value?.rates.find((r) => bankMap.value.get(r.bank)?.kind === 'cb') ?? null)
 
 const sub = computed(() =>
-  mode.value === 'buy'
+  kind.value === 'card'
+    ? 'Lowest estimated card cost first. Tap any bank to add it to the chart.'
+    : mode.value === 'buy'
     ? 'Cheapest dollars first. Tap any bank to add it to the chart.'
     : 'Most rupees first. Tap any bank to add it to the chart.',
 )

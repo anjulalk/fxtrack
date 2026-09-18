@@ -6,6 +6,7 @@ import {
   bankMap,
   best,
   icon,
+  kind,
   mode,
   rows,
   save,
@@ -55,7 +56,9 @@ const spread = computed(() => {
 })
 
 const side = computed(() =>
-  mode.value === 'buy'
+  kind.value === 'card'
+    ? 'the lowest estimated card cost of any bank we track'
+    : mode.value === 'buy'
     ? 'the lowest selling rate of any bank we track'
     : 'the highest buying rate of any bank we track',
 )
@@ -65,7 +68,9 @@ const side = computed(() =>
   <section class="card rise p-6 sm:p-8">
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div class="min-w-0">
-        <p class="label text-faint">Best rate right now</p>
+        <p class="label text-faint">
+          {{ kind === 'card' ? 'Estimated card rate right now' : 'Best rate right now' }}
+        </p>
         <div class="mt-3 flex items-end gap-3">
           <span class="fig text-6xl font-semibold leading-none sm:text-7xl" :class="accent">
             {{ rate(best?.v) }}

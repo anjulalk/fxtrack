@@ -11,6 +11,7 @@ import {
   type WinId,
 } from '@fxtrack/shared'
 import { getHist, getLatest } from './api'
+import { quote } from './fees'
 import { grade, rank, score, stat, type Row } from './stats'
 
 export const WINDOWS = WINS
@@ -103,11 +104,13 @@ export const rows = computed<Row[]>(() => {
   const l = latest.value
   if (!l) return []
   const s = stale.value
-  return rank(
+  const out = rank(
     l.rates.filter((r) => bankMap.value.get(r.bank)?.kind === 'bank' && !s.has(r.bank)),
     mode.value,
     kind.value,
   )
+  if (kind.value !== 'card') return out
+  return out.map((r) => ({ ...r, v: quote(r.v, kind.value), gap: quote(r.gap, kind.value) }))
 })
 
 export const best = computed(() => rows.value[0] ?? null)
@@ -144,7 +147,7 @@ export const bestSeries = computed<{ days: string[]; vals: Col }>(() => {
       if (v == null) continue
       if (acc == null || (low ? v < acc : v > acc)) acc = v
     }
-    return acc
+    return acc == null ? null : quote(acc, kind.value)
   })
 
   const n = winDays.value
@@ -251,7 +254,9 @@ export const picked = computed<Line[]>(() => {
         name: bankMap.value.get(id)?.name ?? id,
         color: tint.value.get(id) ?? PALETTE[0]!,
         days,
-        vals: n >= raw.length ? raw : raw.slice(-n),
+        vals: (n >= raw.length ? raw : raw.slice(-n)).map((v) =>
+          v == null ? null : quote(v, kind.value),
+        ),
       },
     ]
   })
