@@ -1,17 +1,16 @@
-import { computed, ref, shallowRef, watch } from 'vue'
+import { computed, reactive, ref, shallowRef, toRefs, watch } from 'vue'
 import {
   field,
   WINS,
   type Bank,
   type Col,
   type Hist,
-  type Kind,
   type Latest,
-  type Mode,
   type WinId,
 } from '@fxtrack/shared'
 import { getHist, getLatest } from './api'
 import { quote } from './fees'
+import { loadSettings, saveSettings } from './settings'
 import { grade, rank, score, stat, type Row } from './stats'
 
 export const WINDOWS = WINS
@@ -19,10 +18,25 @@ export type { WinId }
 
 const CB = 'cbsl'
 
-export const mode = ref<Mode>('buy')
-export const kind = ref<Kind>('tt')
-export const win = ref<WinId>('3m')
-export const amount = ref(1000)
+const restored = loadSettings()
+const state = reactive(restored.value)
+const settingRefs = toRefs(state)
+let seeded = restored.found
+
+export const mode = settingRefs.mode
+export const kind = settingRefs.kind
+export const win = settingRefs.win
+export const amount = settingRefs.amount
+export const picks = settingRefs.picks
+
+if (restored.migrated) saveSettings(state)
+watch(
+  state,
+  () => {
+    if (restored.supported) saveSettings(state)
+  },
+  { deep: true },
+)
 
 export const latest = shallowRef<Latest | null>(null)
 export const hist = shallowRef<Hist | null>(null)
@@ -61,6 +75,7 @@ export async function load(): Promise<void> {
   try {
     const [a] = await Promise.all([getLatest(), pull(win.value)])
     latest.value = a
+    seedPicks()
   } catch (e) {
     err.value = e instanceof Error ? e.message : String(e)
   } finally {
@@ -132,6 +147,25 @@ export const worstRows = computed<Row[]>(() => {
 
 export const best = computed(() => bestRows.value[0] ?? null)
 export const worst = computed(() => worstRows.value[0] ?? null)
+
+export const compareRows = computed<Row[]>(() => {
+  const out: Row[] = []
+  const seen = new Set<string>()
+  for (const r of [...bestRows.value, ...rows.value.filter((r) => picks.value.includes(r.rate.bank))]) {
+    if (seen.has(r.rate.bank)) continue
+    seen.add(r.rate.bank)
+    out.push(r)
+  }
+  return out
+})
+
+function seedPicks(): void {
+  if (seeded) return
+  const ids = [...bestRows.value, ...worstRows.value].map((r) => r.rate.bank)
+  if (!ids.length) return
+  picks.value = [...new Set(ids)]
+  seeded = true
+}
 
 /** Spread between the best and worst bank right now, on the amount entered. */
 export const save = computed(() => {
@@ -229,8 +263,6 @@ export const tint = computed(() => {
   ids.forEach((id, i) => m.set(id, PALETTE[i % PALETTE.length]!))
   return m
 })
-
-export const picks = ref<string[]>([])
 
 export function toggle(id: string): void {
   const i = picks.value.indexOf(id)

@@ -132,10 +132,8 @@ onMounted(load)
       <Hero />
       <Compare />
       <Chart />
-      <div class="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-        <Ranks />
-        <Conv />
-      </div>
+      <Conv />
+      <Ranks />
     </main>
 
     <footer class="mt-14 border-t border-line pt-7 text-sm leading-relaxed text-mute">
