@@ -8,15 +8,13 @@
     "tick": "npm run bundle && node .tmp/job.js",
     "snap": "npm run bundle && node .tmp/snap.js",
     "backfill": "node scripts/backfill.mjs",
-    "check": "tsc --noEmit",
-    "deploy": "wrangler deploy"
+    "check": "tsc --noEmit"
   },
   "dependencies": {
     "@fxtrack/shared": "*"
   },
   "devDependencies": {
-    "wrangler": "^4.42.0",
-    "esbuild": "^0.28.1",
-    "@types/node": "^24.7.0"
+    "@types/node": "^24.7.0",
+    "esbuild": "^0.28.1"
   }
 }

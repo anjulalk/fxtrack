@@ -11,8 +11,7 @@
     "check": "npm run check --workspaces --if-present",
     "tick": "npm run tick --workspace @fxtrack/worker",
     "snap": "npm run snap --workspace @fxtrack/worker",
-    "backfill": "npm run backfill --workspace @fxtrack/worker",
-    "deploy": "npm run deploy --workspace @fxtrack/worker"
+    "backfill": "npm run backfill --workspace @fxtrack/worker"
   },
   "devDependencies": {
     "exceljs": "^4.4.0",
