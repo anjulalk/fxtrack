@@ -5,6 +5,7 @@ import {
   type Bank,
   type Col,
   type Hist,
+  type Intra,
   type Latest,
   type WinId,
 } from '@fxtrack/shared'
@@ -39,12 +40,14 @@ watch(
 )
 
 export const latest = shallowRef<Latest | null>(null)
-export const hist = shallowRef<Hist | null>(null)
+type Snap = Hist | Intra
+
+export const hist = shallowRef<Snap | null>(null)
 export const busy = ref(true)
 export const winBusy = ref(false)
 export const err = ref<string | null>(null)
 
-const cache = new Map<WinId, Hist>()
+const cache = new Map<WinId, Snap>()
 const now = ref(Math.floor(Date.now() / 1000))
 if (typeof window !== 'undefined') {
   window.setInterval(() => {
@@ -94,7 +97,15 @@ watch(mode, (m) => {
   if (m === 'sell' && kind.value === 'card') kind.value = 'tt'
 })
 
-export const winDays = computed(() => WINDOWS.find((w) => w.id === win.value)!.days)
+const activeWindow = computed(() => WINDOWS.find((w) => w.id === win.value)!)
+export const winDays = computed(() =>
+  activeWindow.value.intra ? Number.MAX_SAFE_INTEGER : activeWindow.value.days,
+)
+
+function axis(h: Snap): number[] {
+  if ('ts' in h) return h.ts
+  return h.days.map((d) => Date.parse(`${d}T00:00:00Z`) / 1000)
+}
 
 export const bankMap = computed(() => {
   const m = new Map<string, Bank>()
@@ -176,12 +187,18 @@ export const save = computed(() => {
 })
 
 /** Daily series of the best rate available across banks, for the chart. */
-export const bestSeries = computed<{ days: string[]; vals: Col }>(() => {
+export interface Plot {
+  ts: number[]
+  vals: Col
+}
+
+export const bestSeries = computed<Plot>(() => {
   const h = hist.value
-  if (!h) return { days: [], vals: [] }
+  if (!h) return { ts: [], vals: [] }
 
   const f = field(mode.value, kind.value)
   const low = mode.value === 'buy'
+  const all = axis(h)
   const cols: Col[] = []
   for (const [id, s] of Object.entries(h.ser)) {
     if (bankMap.value.get(id)?.kind !== 'bank') continue
@@ -189,7 +206,7 @@ export const bestSeries = computed<{ days: string[]; vals: Col }>(() => {
     cols.push(s[f])
   }
 
-  const vals: Col = h.days.map((_, i) => {
+  const vals: Col = all.map((_, i) => {
     let acc: number | null = null
     for (const c of cols) {
       const v = c[i]
@@ -200,8 +217,8 @@ export const bestSeries = computed<{ days: string[]; vals: Col }>(() => {
   })
 
   const n = winDays.value
-  if (n >= h.days.length) return { days: h.days, vals }
-  return { days: h.days.slice(-n), vals: vals.slice(-n) }
+  if (n >= all.length) return { ts: all, vals }
+  return { ts: all.slice(-n), vals: vals.slice(-n) }
 })
 
 /**
@@ -211,15 +228,16 @@ export const bestSeries = computed<{ days: string[]; vals: Col }>(() => {
  *
  * A mid has no buy/sell side, so the baseline is the same line in either mode.
  */
-export const cbslSeries = computed<{ days: string[]; vals: Col }>(() => {
+export const cbslSeries = computed<Plot>(() => {
   const h = hist.value
   const s = h?.ser[CB]
-  if (!h || !s) return { days: [], vals: [] }
+  if (!h || !s) return { ts: [], vals: [] }
 
   const vals = s.mid
+  const all = axis(h)
   const n = winDays.value
-  if (n >= h.days.length) return { days: h.days, vals }
-  return { days: h.days.slice(-n), vals: vals.slice(-n) }
+  if (n >= all.length) return { ts: all, vals }
+  return { ts: all.slice(-n), vals: vals.slice(-n) }
 })
 
 export const trend = computed(() => stat(bestSeries.value.vals))
@@ -278,7 +296,7 @@ export interface Line {
   id: string
   name: string
   color: string
-  days: string[]
+  ts: number[]
   vals: Col
 }
 
@@ -289,7 +307,8 @@ export const picked = computed<Line[]>(() => {
 
   const f = field(mode.value, kind.value)
   const n = winDays.value
-  const days = n >= h.days.length ? h.days : h.days.slice(-n)
+  const all = axis(h)
+  const ts = n >= all.length ? all : all.slice(-n)
 
   return picks.value.flatMap((id) => {
     const s = h.ser[id]
@@ -300,7 +319,7 @@ export const picked = computed<Line[]>(() => {
         id,
         name: bankMap.value.get(id)?.name ?? id,
         color: tint.value.get(id) ?? PALETTE[0]!,
-        days,
+        ts,
         vals: (n >= raw.length ? raw : raw.slice(-n)).map((v) =>
           v == null ? null : quote(v, kind.value),
         ),

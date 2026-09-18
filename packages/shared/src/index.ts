@@ -52,7 +52,7 @@ export interface Hist {
   ser: Record<string, Ser>
 }
 
-/** Hourly detail for the recent window. */
+/** Scheduled-run detail for the recent intraday window. */
 export interface Intra {
   gen: number
   ts: number[]
@@ -91,11 +91,12 @@ export function cmp(m: Mode): (a: number, b: number) => number {
  * downloads only the span on screen instead of the whole 20-year backlog.
  */
 export const WINS = [
-  { id: '7d', label: '7D', days: 7 },
-  { id: '1m', label: '1M', days: 30 },
-  { id: '3m', label: '3M', days: 90 },
-  { id: '1y', label: '1Y', days: 365 },
-  { id: 'all', label: 'All', days: Number.MAX_SAFE_INTEGER },
+  { id: '1d', label: '1D', days: 1, intra: true },
+  { id: '7d', label: '7D', days: 7, intra: false },
+  { id: '1m', label: '1M', days: 30, intra: false },
+  { id: '3m', label: '3M', days: 90, intra: false },
+  { id: '1y', label: '1Y', days: 365, intra: false },
+  { id: 'all', label: 'All', days: Number.MAX_SAFE_INTEGER, intra: false },
 ] as const
 
 export type WinId = (typeof WINS)[number]['id']

@@ -36,13 +36,13 @@ const TONE = {
   sell: { line: '#157a58', top: 'rgba(21,122,88,0.20)', bot: 'rgba(21,122,88,0.01)' },
 } as const
 
-function toPoints(s: { days: string[]; vals: (number | null)[] }) {
+function toPoints(s: { ts: number[]; vals: (number | null)[] }) {
   const out: { time: UTCTimestamp; value: number }[] = []
-  for (let i = 0; i < s.days.length; i++) {
+  for (let i = 0; i < s.ts.length; i++) {
     const v = s.vals[i]
-    const d = s.days[i]
-    if (v == null || !d) continue
-    out.push({ time: (Date.parse(`${d}T00:00:00Z`) / 1000) as UTCTimestamp, value: v })
+    const ts = s.ts[i]
+    if (v == null || ts == null) continue
+    out.push({ time: ts as UTCTimestamp, value: v })
   }
   return out
 }
@@ -50,13 +50,20 @@ function toPoints(s: { days: string[]; vals: (number | null)[] }) {
 const data = computed(() => toPoints(bestSeries.value))
 const refData = computed(() => toPoints(cbslSeries.value))
 
-const lede = computed(() =>
-  kind.value === 'card'
+const lede = computed(() => {
+  if (win.value === '1d') {
+    return kind.value === 'card'
+      ? 'The estimated landed cost at each scheduled snapshot in the last 24 hours.'
+      : mode.value === 'buy'
+        ? 'The lowest selling rate captured at each scheduled snapshot.'
+        : 'The highest buying rate captured at each scheduled snapshot.'
+  }
+  return kind.value === 'card'
     ? 'The lowest estimated landed cost for a USD card purchase, day by day.'
     : mode.value === 'buy'
-    ? 'The lowest price anyone was selling dollars at, day by day.'
-    : 'The highest price anyone was buying dollars at, day by day.',
-)
+      ? 'The lowest price anyone was selling dollars at, day by day.'
+      : 'The highest price anyone was buying dollars at, day by day.'
+})
 
 function paint() {
   if (!area) return
@@ -240,8 +247,14 @@ watch(mode, paint)
         </div>
       </div>
       <p class="mt-3 text-[13px] leading-snug text-faint">
-        Drawn from the Central Bank's indicative spot rate, published every trading day since
-        2010, which is the fairest way to judge whether today is cheap or dear.
+        <span v-if="win === '1d'">
+          Shows the scheduled snapshots received in the last 24 hours; unchanged bank quotes are
+          carried forward between runs.
+        </span>
+        <span v-else>
+          Drawn from the Central Bank's indicative spot rate, published every trading day since
+          2010, which is the fairest way to judge whether today is cheap or dear.
+        </span>
       </p>
     </div>
   </section>

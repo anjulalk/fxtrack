@@ -1,6 +1,6 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import type { Bank, Hist, Latest, Rate, Ser } from '@fxtrack/shared'
+import type { Bank, Hist, Intra, Latest, Rate, Ser } from '@fxtrack/shared'
 import { dayCo } from './lib/time'
 import type { Quote } from './srcs/types'
 
@@ -227,4 +227,44 @@ export function buildHist(n?: number): Hist {
   }
 
   return { gen: now(), days, ser }
+}
+
+export function buildIntra(ids: string[], hours = 24): Intra {
+  const ticks = readTick().sort((a, b) => a.ts - b.ts)
+  const runs = readRuns().map((r) => r.ts)
+  const to = now()
+  const from = to - hours * 3600
+  const points = [
+    ...new Set([...runs, ...ticks.map((t) => t.ts)].filter((ts) => ts >= from && ts <= to)),
+  ].sort((a, b) => a - b)
+  const ser: Record<string, Ser> = {}
+  const blank = (): Ser => ({
+    ttBuy: new Array(points.length).fill(null),
+    ttSell: new Array(points.length).fill(null),
+    nBuy: new Array(points.length).fill(null),
+    nSell: new Array(points.length).fill(null),
+    mid: new Array(points.length).fill(null),
+  })
+  for (const id of ids) ser[id] = blank()
+
+  const state = new Map<string, Tick>()
+  let j = 0
+  for (let i = 0; i < points.length; i++) {
+    const ts = points[i]!
+    while (j < ticks.length && ticks[j]!.ts <= ts) {
+      const tick = ticks[j]!
+      state.set(tick.bank, tick)
+      j++
+    }
+    for (const [id, tick] of state) {
+      const x = (ser[id] ??= blank())
+      x.ttBuy[i] = tick.ttBuy
+      x.ttSell[i] = tick.ttSell
+      x.nBuy[i] = tick.nBuy
+      x.nSell[i] = tick.nSell
+      x.mid[i] = tick.mid
+    }
+  }
+
+  return { gen: now(), ts: points, ser }
 }
