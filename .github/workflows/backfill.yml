@@ -1,0 +1,39 @@
+name: backfill
+
+# CBSL publishes its history as a monthly workbook, so this only needs to run
+# occasionally. It rewrites the cbsl rows in data/day.csv and leaves bank rows alone.
+on:
+  schedule:
+    - cron: '20 2 3 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Backfill CBSL
+        run: npm run backfill
+
+      - name: Commit data
+        run: |
+          git config user.name 'fxtrack bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data
+          if git diff --cached --quiet; then
+            echo 'no new cbsl history'
+          else
+            git commit -m "data: cbsl backfill $(date -u '+%Y-%m-%d')"
+            git push
+          fi

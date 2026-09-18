@@ -1,0 +1,107 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  --color-ink-950: #05070a;
+  --color-ink-900: #080b11;
+  --color-ink-850: #0b1018;
+  --color-ink-800: #101724;
+  --color-ink-750: #16202f;
+  --color-ink-700: #1d2a3b;
+  --color-ink-600: #27374c;
+  --color-ink-500: #3b4f68;
+  --color-ink-400: #5a7290;
+  --color-ink-300: #8599b3;
+  --color-ink-200: #b6c5d8;
+  --color-ink-100: #e3ebf4;
+
+  /* Selling USD to a bank: you want the number to go up. */
+  --color-sell: #2ee6a8;
+  /* Buying USD from a bank: you want the number to go down. */
+  --color-buy: #ffa640;
+
+  --color-up: #2ee6a8;
+  --color-down: #ff5c7a;
+  --color-brand: #5b8dff;
+  --color-gold: #ffc043;
+
+  --radius-card: 1rem;
+}
+
+@layer base {
+  html {
+    background: var(--color-ink-950);
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    color: var(--color-ink-100);
+    background:
+      radial-gradient(1200px 600px at 12% -8%, rgb(91 141 255 / 0.13), transparent 60%),
+      radial-gradient(1000px 520px at 88% 0%, rgb(46 230 168 / 0.09), transparent 55%),
+      var(--color-ink-950);
+    background-attachment: fixed;
+    min-height: 100dvh;
+  }
+
+  /* Rates must line up column-to-column. */
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: rgb(91 141 255 / 0.35);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-ink-700);
+    border-radius: 99px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ink-600);
+    background-clip: content-box;
+  }
+}
+
+@utility card {
+  border-radius: var(--radius-card);
+  border: 1px solid rgb(255 255 255 / 0.07);
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.045) 0%,
+    rgb(255 255 255 / 0.015) 100%
+  );
+  backdrop-filter: blur(12px);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility rise {
+  animation: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}

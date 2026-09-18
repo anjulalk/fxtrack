@@ -1,0 +1,47 @@
+name: deploy
+
+# Code pushes rebuild the site from whatever data is already committed.
+# Bot data commits use GITHUB_TOKEN, which does not retrigger workflows.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'data/**'
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check
+        run: npm run check
+
+      - name: Snapshot
+        run: npm run snap
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: packages/worker
+          command: deploy

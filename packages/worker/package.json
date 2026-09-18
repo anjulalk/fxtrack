@@ -1,0 +1,22 @@
+{
+  "name": "@fxtrack/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bundle": "esbuild src/job.ts src/snap.ts --bundle --platform=node --format=esm --target=node22 --outdir=.tmp --log-level=warning",
+    "tick": "npm run bundle && node .tmp/job.js",
+    "snap": "npm run bundle && node .tmp/snap.js",
+    "backfill": "node scripts/backfill.mjs",
+    "check": "tsc --noEmit",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@fxtrack/shared": "*"
+  },
+  "devDependencies": {
+    "wrangler": "^4.42.0",
+    "esbuild": "^0.28.1",
+    "@types/node": "^24.7.0"
+  }
+}
