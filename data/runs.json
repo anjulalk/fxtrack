@@ -1,1 +1,1 @@
-[{"ts":1789721941,"ok":10,"bad":0,"ms":2317,"note":""}]
+[{"ts":1789721941,"ok":10,"bad":0,"ms":2317,"note":""},{"ts":1789722906,"ok":7,"bad":3,"ms":12265,"note":"boc: HTTP 403 https://www.boc.lk/rates-tariff | combank: HTTP 403 https://www.combank.lk/rates-tariff | ntb: HTTP 403 https://www.nationstrust.com/exchange-rates"}]
