@@ -8,8 +8,16 @@ import { clock } from './lib/fmt'
 import { busy, err, kind, latest, load, mode } from './lib/store'
 
 const MODES = [
-  { id: 'buy', label: "I'm buying USD", hint: 'You pay LKR for dollars' },
-  { id: 'sell', label: "I'm selling USD", hint: 'You get LKR for dollars' },
+  {
+    id: 'buy',
+    label: "I'm buying dollars",
+    hint: 'You hand over rupees. The bank\u2019s selling rate applies, so lower is better.',
+  },
+  {
+    id: 'sell',
+    label: "I'm selling dollars",
+    hint: 'You receive rupees. The bank\u2019s buying rate applies, so higher is better.',
+  },
 ] as const
 
 const KINDS = [
@@ -22,25 +30,40 @@ const stamp = computed(() => {
   return t ? clock(t) : null
 })
 
+const note = computed(() =>
+  kind.value === 'tt'
+    ? 'Telegraphic transfers and inward remittances. Banks almost always price these better than physical currency.'
+    : 'Physical notes over the counter. Expect a wider spread than a wire for the same day.',
+)
+
 onMounted(load)
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-    <header class="flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h1 class="text-xl font-semibold tracking-tight">
-          fx<span class="text-brand">track</span>
-        </h1>
-        <p class="mt-0.5 text-sm text-ink-400">US Dollar to Sri Lankan Rupee</p>
+  <div class="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+    <header class="border-b border-line pb-7">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">
+            fx<span class="text-brand">track</span>
+          </h1>
+          <p class="mt-1.5 text-lg text-mute">
+            Every bank's US dollar rate in Sri Lanka, in one place.
+          </p>
+        </div>
+        <p v-if="stamp" class="ui shrink-0 text-xs text-faint">
+          Last checked {{ stamp }} <span class="text-faint/80">&middot; Colombo time</span>
+        </p>
       </div>
-      <p v-if="stamp" class="text-xs text-ink-500">
-        Updated {{ stamp }}
-        <span class="text-ink-600">· Colombo time</span>
+
+      <p class="mt-5 max-w-2xl text-[15px] leading-relaxed text-mute">
+        Banks quote two different prices for the same dollar, and on any given day the gap
+        between the best and worst bank is wide enough to be worth a short detour. Pick the
+        side of the trade you are on and every rate below reorders around it.
       </p>
     </header>
 
-    <div class="mt-6 grid gap-2 sm:grid-cols-2">
+    <div class="mt-7 grid gap-2.5 sm:grid-cols-2">
       <button
         v-for="m in MODES"
         :key="m.id"
@@ -49,50 +72,57 @@ onMounted(load)
         :class="
           mode === m.id
             ? m.id === 'buy'
-              ? 'border-buy/40! bg-buy/8!'
-              : 'border-sell/40! bg-sell/8!'
-            : 'opacity-55 hover:opacity-85'
+              ? 'border-buy/45! bg-buy/6!'
+              : 'border-sell/45! bg-sell/6!'
+            : 'opacity-70 hover:opacity-100 hover:border-faint/45!'
         "
         @click="mode = m.id"
       >
         <span
-          class="block text-sm font-semibold"
-          :class="mode === m.id ? (m.id === 'buy' ? 'text-buy' : 'text-sell') : 'text-ink-200'"
+          class="block text-base font-semibold"
+          :class="mode === m.id ? (m.id === 'buy' ? 'text-buy' : 'text-sell') : 'text-ink'"
         >{{ m.label }}</span>
-        <span class="mt-0.5 block text-xs text-ink-400">{{ m.hint }}</span>
+        <span class="mt-1 block text-[13px] leading-snug text-mute">{{ m.hint }}</span>
       </button>
     </div>
 
-    <div class="mt-3 flex rounded-lg border border-white/8 bg-ink-900/60 p-0.5 sm:w-fit">
-      <button
-        v-for="k in KINDS"
-        :key="k.id"
-        type="button"
-        class="flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition sm:flex-none"
-        :class="kind === k.id ? 'bg-white/10 text-ink-100' : 'text-ink-400 hover:text-ink-200'"
-        @click="kind = k.id"
-      >
-        {{ k.label }}
-      </button>
+    <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div class="flex rounded-lg border border-line bg-wash p-0.5">
+        <button
+          v-for="k in KINDS"
+          :key="k.id"
+          type="button"
+          class="ui rounded-md px-3 py-1.5 text-xs font-medium transition"
+          :class="
+            kind === k.id
+              ? 'bg-card text-ink shadow-sm'
+              : 'text-mute hover:text-ink'
+          "
+          @click="kind = k.id"
+        >
+          {{ k.label }}
+        </button>
+      </div>
+      <p class="max-w-md text-[13px] leading-snug text-faint">{{ note }}</p>
     </div>
 
-    <div v-if="err" class="card mt-6 border-down/30! p-5 text-sm">
-      <p class="font-medium text-down">Could not load rates</p>
-      <p class="mt-1 text-ink-400">{{ err }}</p>
+    <div v-if="err" class="card mt-7 border-down/35! p-5 text-sm">
+      <p class="font-semibold text-down">Could not load rates</p>
+      <p class="mt-1 text-mute">{{ err }}</p>
       <button
         type="button"
-        class="mt-3 rounded-lg border border-white/10 px-3 py-1.5 text-xs text-ink-200 hover:bg-white/5"
+        class="ui mt-3 rounded-lg border border-line px-3 py-1.5 text-xs text-ink transition hover:bg-wash"
         @click="load"
       >
         Try again
       </button>
     </div>
 
-    <div v-else-if="busy" class="card mt-6 animate-pulse p-8 text-center text-sm text-ink-500">
+    <div v-else-if="busy" class="card mt-7 animate-pulse p-10 text-center text-sm text-faint">
       Loading rates…
     </div>
 
-    <main v-else class="mt-6 space-y-5">
+    <main v-else class="mt-7 space-y-5">
       <Hero />
       <Chart />
       <div class="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
@@ -101,9 +131,38 @@ onMounted(load)
       </div>
     </main>
 
-    <footer class="mt-10 border-t border-white/5 pt-5 text-xs leading-relaxed text-ink-600">
-      Rates are scraped hourly from each bank's public website and may lag their counters.
-      Always confirm with the bank before transacting.
+    <footer class="mt-14 border-t border-line pt-7 text-sm leading-relaxed text-mute">
+      <div class="grid gap-7 sm:grid-cols-3">
+        <div>
+          <h2 class="label text-faint">How this works</h2>
+          <p class="mt-2">
+            Four times a day a scheduled job reads the published exchange rate page of each
+            bank, stores what it finds, and rebuilds this site. Nothing is entered by hand and
+            there is no server in between.
+          </p>
+        </div>
+        <div>
+          <h2 class="label text-faint">Where the numbers come from</h2>
+          <p class="mt-2">
+            Only official bank websites and the Central Bank of Sri Lanka. Every bank name in
+            the table links back to the page its rate was read from, so you can check it
+            yourself.
+          </p>
+        </div>
+        <div>
+          <h2 class="label text-faint">Before you transact</h2>
+          <p class="mt-2">
+            Published rates are indicative. Counter and branch rates move during the day, large
+            amounts are often negotiable, and fees are not included here. Confirm with the bank
+            before committing.
+          </p>
+        </div>
+      </div>
+      <p class="mt-7 border-t border-hair pt-5 text-xs text-faint">
+        fxtrack is an independent project and is not affiliated with, endorsed by, or operated
+        by any bank listed. Bank names and marks belong to their respective owners and are used
+        only to identify the source of each rate.
+      </p>
     </footer>
   </div>
 </template>

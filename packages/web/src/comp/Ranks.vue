@@ -2,12 +2,13 @@
 import { pick } from '@fxtrack/shared'
 import { computed } from 'vue'
 import { ago, DASH, rate } from '../lib/fmt'
-import { bankMap, kind, latest, mode, picks, rows, tint, toggle } from '../lib/store'
+import { bankMap, icon, kind, latest, live, mode, picks, rows, stale, tint, toggle } from '../lib/store'
 
 const head = computed(() => (mode.value === 'buy' ? 'You pay' : 'You get'))
 const accent = computed(() => (mode.value === 'buy' ? 'text-buy' : 'text-sell'))
 
 const on = (id: string) => picks.value.includes(id)
+const old = (id: string) => stale.value.has(id)
 
 function name(id: string): string {
   return bankMap.value.get(id)?.name ?? id
@@ -26,20 +27,30 @@ const missing = computed(() => {
     .map((r) => name(r.bank))
 })
 
+const frozen = computed(() =>
+  rows.value.filter((r) => old(r.rate.bank)).map((r) => name(r.rate.bank)),
+)
+
 const cbsl = computed(() => latest.value?.rates.find((r) => bankMap.value.get(r.bank)?.kind === 'cb') ?? null)
+
+const sub = computed(() =>
+  mode.value === 'buy'
+    ? 'Cheapest dollars first. Tap any bank to add it to the chart.'
+    : 'Most rupees first. Tap any bank to add it to the chart.',
+)
 </script>
 
 <template>
   <section class="card rise overflow-hidden">
-    <div class="flex items-center justify-between px-5 pt-5 sm:px-6">
-      <h2 class="text-sm font-semibold text-ink-100">Every bank, ranked</h2>
-      <span class="text-xs text-ink-500">Tap a bank to chart it</span>
+    <div class="px-5 pt-5 sm:px-6">
+      <h2 class="text-lg font-semibold text-ink">Every bank, ranked</h2>
+      <p class="mt-0.5 text-[13px] text-mute">{{ sub }}</p>
     </div>
 
     <div class="mt-4 overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="border-y border-white/5 text-[11px] uppercase tracking-wider text-ink-500">
+          <tr class="label border-y border-hair bg-wash/60 text-faint">
             <th class="py-2.5 pl-5 pr-3 text-left font-medium sm:pl-6">Bank</th>
             <th class="px-3 py-2.5 text-right font-medium">{{ head }}</th>
             <th class="px-3 py-2.5 text-right font-medium">Vs best</th>
@@ -50,21 +61,21 @@ const cbsl = computed(() => latest.value?.rates.find((r) => bankMap.value.get(r.
           <tr
             v-for="(r, i) in rows"
             :key="r.rate.bank"
-            class="cursor-pointer border-b border-white/5 transition last:border-0 hover:bg-white/[0.03]"
-            :class="on(r.rate.bank) && 'bg-white/[0.04]'"
+            class="cursor-pointer border-b border-hair transition last:border-0 hover:bg-wash"
+            :class="[on(r.rate.bank) && 'bg-wash', old(r.rate.bank) && 'opacity-70']"
             @click="toggle(r.rate.bank)"
           >
             <td class="py-3 pl-5 pr-3 sm:pl-6">
               <div class="flex items-center gap-2.5">
                 <span
                   class="grid h-4 w-4 shrink-0 place-items-center rounded-[5px] border transition"
-                  :class="on(r.rate.bank) ? 'border-transparent' : 'border-white/20'"
+                  :class="on(r.rate.bank) ? 'border-transparent' : 'border-line'"
                   :style="on(r.rate.bank) ? { background: tint.get(r.rate.bank) } : undefined"
                 >
                   <svg
                     v-if="on(r.rate.bank)"
                     viewBox="0 0 12 12"
-                    class="h-2.5 w-2.5 text-ink-950"
+                    class="h-2.5 w-2.5 text-white"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2.5"
@@ -74,33 +85,59 @@ const cbsl = computed(() => latest.value?.rates.find((r) => bankMap.value.get(r.
                     <path d="M2.5 6.5 5 9l4.5-5.5" />
                   </svg>
                 </span>
-                <span class="num w-3 text-xs" :class="i === 0 ? 'text-gold' : 'text-ink-600'">
-                  {{ i + 1 }}
-                </span>
+
+                <span
+                  class="num w-3 shrink-0 text-xs"
+                  :class="old(r.rate.bank) ? 'text-faint/60' : i === 0 ? 'text-gold' : 'text-faint'"
+                >{{ old(r.rate.bank) ? DASH : i + 1 }}</span>
+
+                <img
+                  :src="icon(r.rate.bank)"
+                  alt=""
+                  class="h-5 w-5 shrink-0 rounded-[5px] object-contain"
+                  :class="old(r.rate.bank) && 'grayscale'"
+                  loading="lazy"
+                />
+
                 <a
                   v-if="url(r.rate.bank)"
                   :href="url(r.rate.bank)!"
                   target="_blank"
                   rel="noreferrer"
-                  class="font-medium text-ink-100 hover:text-brand"
+                  class="font-medium text-ink transition hover:text-brand"
                   @click.stop
                 >{{ name(r.rate.bank) }}</a>
-                <span v-else class="font-medium text-ink-100">{{ name(r.rate.bank) }}</span>
+                <span v-else class="font-medium text-ink">{{ name(r.rate.bank) }}</span>
+
+                <span
+                  v-if="old(r.rate.bank)"
+                  class="ui shrink-0 rounded-full border border-gold/40 bg-gold/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold"
+                  title="This bank blocks our scraper, so this is its last confirmed quote"
+                >stale</span>
               </div>
             </td>
-            <td class="num px-3 py-3 text-right" :class="i === 0 ? accent : 'text-ink-100'">
+
+            <td
+              class="num px-3 py-3 text-right"
+              :class="old(r.rate.bank) ? 'text-mute' : i === 0 ? accent : 'text-ink'"
+            >
               {{ rate(r.v) }}
             </td>
-            <td class="num px-3 py-3 text-right text-xs text-ink-500">
-              {{ r.gap === 0 ? 'best' : `+${rate(r.gap)}` }}
+
+            <td class="num px-3 py-3 text-right text-xs text-faint">
+              {{ old(r.rate.bank) ? DASH : r.gap === 0 ? 'best' : `+${rate(r.gap)}` }}
             </td>
-            <td class="py-3 pl-3 pr-5 text-right text-xs text-ink-500 sm:pr-6">
+
+            <td
+              class="ui py-3 pl-3 pr-5 text-right text-xs sm:pr-6"
+              :class="old(r.rate.bank) ? 'text-gold' : 'text-faint'"
+            >
               {{ ago(r.rate.ts) }}
             </td>
           </tr>
 
           <tr v-if="!rows.length">
-            <td colspan="4" class="px-6 py-10 text-center text-sm text-ink-500">
+            <td colspan="4" class="px-6 py-10 text-center text-sm text-faint">
               No rates available.
             </td>
           </tr>
@@ -109,15 +146,29 @@ const cbsl = computed(() => latest.value?.rates.find((r) => bankMap.value.get(r.
     </div>
 
     <div
-      v-if="cbsl || missing.length"
-      class="space-y-1.5 border-t border-white/5 px-5 py-4 text-xs text-ink-500 sm:px-6"
+      v-if="cbsl || missing.length || frozen.length"
+      class="space-y-2 border-t border-hair bg-wash/50 px-5 py-4 text-[13px] leading-snug text-mute sm:px-6"
     >
       <p v-if="cbsl">
         Central Bank indicative mid rate
-        <span class="num text-ink-300">{{ cbsl.mid == null ? DASH : rate(cbsl.mid) }}</span>
-        &middot; reference only, not dealable
+        <span class="num text-ink">{{ cbsl.mid == null ? DASH : rate(cbsl.mid) }}</span>
+        &middot; a reference for where the market sits, not a price you can deal at.
       </p>
-      <p v-if="missing.length">{{ missing.join(', ') }} do not publish this rate</p>
+      <p v-if="frozen.length">
+        <span class="font-semibold text-ink">{{ frozen.join(' and ') }}</span>
+        {{ frozen.length > 1 ? 'block' : 'blocks' }} automated access from our servers, so
+        {{ frozen.length > 1 ? 'those rates are' : 'that rate is' }} the last quote we could
+        confirm. {{ frozen.length > 1 ? 'They are' : 'It is' }} ranked last and left out of the
+        comparison above.
+      </p>
+      <p v-if="missing.length">
+        {{ missing.join(', ') }} {{ missing.length > 1 ? 'do' : 'does' }} not publish this
+        particular rate, so {{ missing.length > 1 ? 'they are' : 'it is' }} not listed here.
+      </p>
+      <p class="text-faint">
+        Rates shown are for {{ live.length }}
+        {{ live.length === 1 ? 'bank' : 'banks' }} currently reporting.
+      </p>
     </div>
   </section>
 </template>

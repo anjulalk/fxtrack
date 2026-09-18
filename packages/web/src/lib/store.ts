@@ -11,7 +11,7 @@ import {
   type WinId,
 } from '@fxtrack/shared'
 import { getHist, getLatest } from './api'
-import { grade, rank, score, stat } from './stats'
+import { grade, rank, score, stat, type Row } from './stats'
 
 export const WINDOWS = WINS
 export type { WinId }
@@ -75,16 +75,56 @@ export const bankMap = computed(() => {
   return m
 })
 
-/** Retail banks only; the central bank rate is a reference, not a dealable price. */
-export const rows = computed(() => {
+/**
+ * Scrapes run four times a day, so the longest honest gap is the ~15h
+ * overnight one. A full day with no fresh read means the bank is blocking us
+ * and the number on screen is last-known, not current.
+ */
+const STALE = 24 * 3600
+
+export const stale = computed(() => {
   const l = latest.value
-  if (!l) return []
-  const retail = l.rates.filter((r) => bankMap.value.get(r.bank)?.kind === 'bank')
-  return rank(retail, mode.value, kind.value)
+  const s = new Set<string>()
+  if (l) for (const r of l.rates) if (l.gen - r.ts > STALE) s.add(r.bank)
+  return s
 })
 
-export const best = computed(() => rows.value[0] ?? null)
-export const worst = computed(() => rows.value[rows.value.length - 1] ?? null)
+export function icon(id: string): string {
+  return `${import.meta.env.BASE_URL}banks/${id}.png`
+}
+
+/** Retail banks only; the central bank rate is a reference, not a dealable price. */
+const split = computed<{ live: Row[]; old: Row[] }>(() => {
+  const l = latest.value
+  if (!l) return { live: [], old: [] }
+
+  const retail = l.rates.filter((r) => bankMap.value.get(r.bank)?.kind === 'bank')
+  const s = stale.value
+  const live = rank(
+    retail.filter((r) => !s.has(r.bank)),
+    mode.value,
+    kind.value,
+  )
+  const old = rank(
+    retail.filter((r) => s.has(r.bank)),
+    mode.value,
+    kind.value,
+  )
+
+  const top = live[0]?.v
+  if (top != null) for (const r of old) r.gap = Math.abs(r.v - top)
+  return { live, old }
+})
+
+/** Frozen quotes rank last and never set the benchmark. */
+export const rows = computed(() => [...split.value.live, ...split.value.old])
+export const live = computed(() => split.value.live)
+
+export const best = computed(() => split.value.live[0] ?? null)
+export const worst = computed(() => {
+  const f = split.value.live
+  return f[f.length - 1] ?? null
+})
 
 /** Spread between the best and worst bank right now, on the amount entered. */
 export const save = computed(() => {
@@ -155,18 +195,18 @@ export const trendScore = computed(() =>
 )
 export const trendGrade = computed(() => grade(trendScore.value))
 
-/** Distinct hues for compared banks; readable on the dark canvas. */
+/** Distinct hues for compared banks; readable on the paper canvas. */
 const PALETTE = [
-  '#5b8dff',
-  '#ff6ec7',
-  '#ffc043',
-  '#2ee6a8',
-  '#a78bfa',
-  '#ff8a5c',
-  '#4dd0e1',
-  '#c3e88d',
-  '#f48fb1',
-  '#9ccc65',
+  '#2563eb',
+  '#c2185b',
+  '#a8790d',
+  '#157a58',
+  '#7c3aed',
+  '#c1603c',
+  '#0e7490',
+  '#4d7c0f',
+  '#b3323f',
+  '#525252',
 ]
 
 /** Colour is keyed to the bank, not to selection order, so it never shifts. */

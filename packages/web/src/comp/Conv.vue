@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { DASH, money, rate } from '../lib/fmt'
-import { amount, best, mode, worst } from '../lib/store'
+import { amount, bankMap, best, icon, mode, worst } from '../lib/store'
 
 const PRESETS = [500, 1000, 5000, 25000]
 
@@ -10,9 +10,22 @@ const lost = computed(() => (worst.value ? worst.value.v * amount.value : null))
 const accent = computed(() => (mode.value === 'buy' ? 'text-buy' : 'text-sell'))
 
 const heading = computed(() =>
-  mode.value === 'buy' ? 'To buy this many dollars' : 'Selling this many dollars',
+  mode.value === 'buy' ? 'Dollars you want to buy' : 'Dollars you want to sell',
 )
 const result = computed(() => (mode.value === 'buy' ? 'It costs you' : 'You receive'))
+
+const id = computed(() => best.value?.rate.bank ?? null)
+const bank = computed(() => (id.value ? (bankMap.value.get(id.value)?.name ?? id.value) : null))
+const worstName = computed(() => {
+  const w = worst.value?.rate.bank
+  return w ? (bankMap.value.get(w)?.name ?? w) : null
+})
+
+const diff = computed(() => {
+  const a = lkr.value
+  const b = lost.value
+  return a == null || b == null ? null : Math.abs(b - a)
+})
 
 function set(e: Event) {
   const v = Number((e.target as HTMLInputElement).value)
@@ -22,21 +35,23 @@ function set(e: Event) {
 
 <template>
   <section class="card rise p-5 sm:p-6">
-    <h2 class="text-sm font-semibold text-ink-100">Converter</h2>
-    <p class="mt-0.5 text-xs text-ink-500">At the best rate available today</p>
+    <h2 class="text-lg font-semibold text-ink">Converter</h2>
+    <p class="mt-0.5 text-[13px] text-mute">
+      Priced at the best rate on the board right now.
+    </p>
 
-    <label class="mt-4 block text-[11px] uppercase tracking-wider text-ink-500">
-      {{ heading }}
-    </label>
-    <div class="mt-2 flex items-center gap-2 rounded-xl border border-white/8 bg-ink-900/60 px-3.5 py-2.5 focus-within:border-brand/50">
-      <span class="text-sm text-ink-400">$</span>
+    <label class="label mt-5 block text-faint">{{ heading }}</label>
+    <div
+      class="mt-2 flex items-center gap-2 rounded-xl border border-line bg-wash px-3.5 py-2.5 transition focus-within:border-brand/60 focus-within:bg-card"
+    >
+      <span class="ui text-sm text-faint">$</span>
       <input
         :value="amount"
         type="number"
         min="0"
         step="100"
         inputmode="decimal"
-        class="num w-full bg-transparent text-lg text-ink-100 outline-none"
+        class="num w-full bg-transparent text-lg text-ink outline-none"
         @input="set"
       />
     </div>
@@ -46,11 +61,11 @@ function set(e: Event) {
         v-for="p in PRESETS"
         :key="p"
         type="button"
-        class="rounded-lg border px-2.5 py-1 text-xs transition"
+        class="ui rounded-lg border px-2.5 py-1 text-xs transition"
         :class="
           amount === p
-            ? 'border-brand/40 bg-brand/10 text-brand'
-            : 'border-white/8 text-ink-400 hover:border-white/15 hover:text-ink-200'
+            ? 'border-brand/45 bg-brand/8 text-brand'
+            : 'border-line text-mute hover:border-faint/60 hover:text-ink'
         "
         @click="amount = p"
       >
@@ -58,15 +73,27 @@ function set(e: Event) {
       </button>
     </div>
 
-    <div class="mt-5 rounded-xl border border-white/5 bg-white/[0.02] p-4">
-      <p class="text-[11px] uppercase tracking-wider text-ink-500">{{ result }}</p>
-      <p class="num mt-1 text-2xl font-semibold" :class="accent">
+    <div class="mt-5 rounded-xl border border-hair bg-wash p-4">
+      <p class="label text-faint">{{ result }}</p>
+      <p class="num mt-1.5 text-2xl font-semibold" :class="accent">
         Rs {{ lkr == null ? DASH : money(lkr) }}
       </p>
-      <p class="mt-2 text-xs text-ink-500">
-        At {{ rate(best?.v) }} per dollar &middot; worst bank
-        <span class="num">Rs {{ lost == null ? DASH : money(lost) }}</span>
+      <p v-if="bank" class="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] text-mute">
+        <span>at</span>
+        <img :src="icon(id!)" alt="" class="h-4 w-4 rounded-[3px] object-contain" loading="lazy" />
+        <span class="font-semibold text-ink">{{ bank }}</span>
+        <span>&middot; {{ rate(best?.v) }} per dollar</span>
       </p>
     </div>
+
+    <p v-if="diff != null && worstName" class="mt-3 text-[13px] leading-snug text-mute">
+      The same {{ mode === 'buy' ? 'purchase' : 'sale' }} at
+      <span class="font-semibold text-ink">{{ worstName }}</span>, the weakest bank on the board,
+      would {{ mode === 'buy' ? 'cost' : 'return' }}
+      <span class="num text-ink">Rs {{ money(lost) }}</span>
+      &mdash; a difference of
+      <span class="num font-semibold" :class="accent">Rs {{ money(diff) }}</span
+      >.
+    </p>
   </section>
 </template>

@@ -10,7 +10,19 @@ import {
 } from 'lightweight-charts'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { DASH, rate } from '../lib/fmt'
-import { bestSeries, cbslSeries, clearPicks, mkt, mode, picked, rows, toggle, win, WINDOWS } from '../lib/store'
+import {
+  bestSeries,
+  cbslSeries,
+  clearPicks,
+  icon,
+  live,
+  mkt,
+  mode,
+  picked,
+  toggle,
+  win,
+  WINDOWS,
+} from '../lib/store'
 
 const host = ref<HTMLDivElement | null>(null)
 let chart: IChartApi | null = null
@@ -19,8 +31,8 @@ let ref_: ISeriesApi<'Line'> | null = null
 const lines = new Map<string, ISeriesApi<'Line'>>()
 
 const TONE = {
-  buy: { line: '#ffa640', top: 'rgba(255,166,64,0.28)', bot: 'rgba(255,166,64,0.01)' },
-  sell: { line: '#2ee6a8', top: 'rgba(46,230,168,0.28)', bot: 'rgba(46,230,168,0.01)' },
+  buy: { line: '#b3541d', top: 'rgba(179,84,29,0.20)', bot: 'rgba(179,84,29,0.01)' },
+  sell: { line: '#157a58', top: 'rgba(21,122,88,0.20)', bot: 'rgba(21,122,88,0.01)' },
 } as const
 
 function toPoints(s: { days: string[]; vals: (number | null)[] }) {
@@ -36,6 +48,12 @@ function toPoints(s: { days: string[]; vals: (number | null)[] }) {
 
 const data = computed(() => toPoints(bestSeries.value))
 const refData = computed(() => toPoints(cbslSeries.value))
+
+const lede = computed(() =>
+  mode.value === 'buy'
+    ? 'The lowest price anyone was selling dollars at, day by day.'
+    : 'The highest price anyone was buying dollars at, day by day.',
+)
 
 function paint() {
   if (!area) return
@@ -86,19 +104,19 @@ onMounted(() => {
     autoSize: true,
     layout: {
       background: { color: 'transparent' },
-      textColor: '#5a7290',
+      textColor: '#94907f',
       fontFamily: "'JetBrains Mono', ui-monospace, monospace",
       attributionLogo: false,
     },
     grid: {
       vertLines: { visible: false },
-      horzLines: { color: 'rgba(255,255,255,0.05)', style: LineStyle.Solid },
+      horzLines: { color: 'rgba(28,27,23,0.06)', style: LineStyle.Solid },
     },
     rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.18, bottom: 0.12 } },
     timeScale: { borderVisible: false, fixLeftEdge: true, fixRightEdge: true },
     crosshair: {
-      vertLine: { color: 'rgba(255,255,255,0.2)', width: 1, style: LineStyle.Dashed, labelVisible: false },
-      horzLine: { color: 'rgba(255,255,255,0.2)', width: 1, style: LineStyle.Dashed },
+      vertLine: { color: 'rgba(28,27,23,0.28)', width: 1, style: LineStyle.Dashed, labelVisible: false },
+      horzLine: { color: 'rgba(28,27,23,0.28)', width: 1, style: LineStyle.Dashed },
     },
     handleScale: false,
     handleScroll: false,
@@ -112,7 +130,7 @@ onMounted(() => {
   })
 
   ref_ = chart.addSeries(LineSeries, {
-    color: 'rgba(133,153,179,0.55)',
+    color: 'rgba(102,98,79,0.55)',
     lineWidth: 1,
     lineStyle: LineStyle.Dashed,
     priceLineVisible: false,
@@ -140,35 +158,29 @@ watch(mode, paint)
 
 <template>
   <section class="card rise p-5 sm:p-6">
-    <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h2 class="text-sm font-semibold text-ink-100">Best available rate</h2>
-        <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-500">
+        <h2 class="text-lg font-semibold text-ink">Best available rate</h2>
+        <p class="mt-0.5 text-[13px] text-mute">{{ lede }}</p>
+        <div class="ui mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-faint">
           <span class="flex items-center gap-1.5">
-            <span
-              class="h-0.5 w-4 rounded-full"
-              :class="mode === 'buy' ? 'bg-buy' : 'bg-sell'"
-            />
-            Best of {{ rows.length }} banks
+            <span class="h-0.5 w-4 rounded-full" :class="mode === 'buy' ? 'bg-buy' : 'bg-sell'" />
+            Best of {{ live.length }} banks
           </span>
           <span v-if="refData.length" class="flex items-center gap-1.5">
-            <span class="h-0 w-4 border-t border-dashed border-ink-300/60" />
+            <span class="h-0 w-4 border-t border-dashed border-mute/60" />
             Market average (Central Bank)
           </span>
         </div>
       </div>
 
-      <div class="flex rounded-lg border border-white/8 bg-ink-900/60 p-0.5">
+      <div class="flex rounded-lg border border-line bg-wash p-0.5">
         <button
           v-for="w in WINDOWS"
           :key="w.id"
           type="button"
-          class="rounded-md px-2.5 py-1 text-xs font-medium transition"
-          :class="
-            win === w.id
-              ? 'bg-white/10 text-ink-100'
-              : 'text-ink-400 hover:text-ink-200'
-          "
+          class="ui rounded-md px-2.5 py-1 text-xs font-medium transition"
+          :class="win === w.id ? 'bg-card text-ink shadow-sm' : 'text-mute hover:text-ink'"
           @click="win = w.id"
         >
           {{ w.label }}
@@ -176,17 +188,18 @@ watch(mode, paint)
       </div>
     </div>
 
-    <div v-if="picked.length" class="mt-3 flex flex-wrap items-center gap-1.5">
+    <div v-if="picked.length" class="mt-3.5 flex flex-wrap items-center gap-1.5">
       <span
         v-for="p in picked"
         :key="p.id"
-        class="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 py-1 pl-2.5 pr-1 text-xs"
+        class="ui flex items-center gap-1.5 rounded-full border border-line bg-wash py-1 pl-1.5 pr-1 text-xs"
       >
+        <img :src="icon(p.id)" alt="" class="h-4 w-4 rounded-[3px] object-contain" loading="lazy" />
         <span class="h-2 w-2 shrink-0 rounded-full" :style="{ background: p.color }" />
-        <span class="text-ink-200">{{ p.name }}</span>
+        <span class="text-ink">{{ p.name }}</span>
         <button
           type="button"
-          class="rounded-full px-1 leading-none text-ink-500 transition hover:text-ink-100"
+          class="rounded-full px-1 leading-none text-faint transition hover:text-ink"
           :aria-label="`Remove ${p.name}`"
           @click="toggle(p.id)"
         >
@@ -195,7 +208,7 @@ watch(mode, paint)
       </span>
       <button
         type="button"
-        class="ml-1 text-xs text-ink-500 underline-offset-2 transition hover:text-ink-200 hover:underline"
+        class="ui ml-1 text-xs text-faint underline-offset-2 transition hover:text-ink hover:underline"
         @click="clearPicks"
       >
         Clear
@@ -204,27 +217,29 @@ watch(mode, paint)
 
     <div ref="host" class="mt-4 h-[280px] w-full sm:h-[340px]" />
 
-    <p v-if="!data.length && !refData.length" class="-mt-32 text-center text-sm text-ink-500">
+    <p v-if="!data.length && !refData.length" class="-mt-32 text-center text-sm text-faint">
       No history yet for this window.
     </p>
 
-    <div class="mt-4 border-t border-white/5 pt-4">
-      <p class="text-[11px] uppercase tracking-wider text-ink-600">
-        Market average over this window
-      </p>
-      <div class="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div class="mt-4 border-t border-hair pt-4">
+      <p class="label text-faint">Market average over this window</p>
+      <div class="mt-2.5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div v-for="s in [
           { k: 'Low', v: mkt.min },
           { k: 'High', v: mkt.max },
           { k: 'Average', v: mkt.avg },
           { k: 'Change', v: mkt.chg },
         ]" :key="s.k">
-          <p class="text-[11px] uppercase tracking-wider text-ink-500">{{ s.k }}</p>
-          <p class="num mt-0.5 text-sm text-ink-100">
+          <p class="label text-faint">{{ s.k }}</p>
+          <p class="num mt-1 text-sm text-ink">
             {{ s.v == null ? DASH : rate(s.v) }}
           </p>
         </div>
       </div>
+      <p class="mt-3 text-[13px] leading-snug text-faint">
+        Drawn from the Central Bank's daily indicative rate, which reaches back two decades and
+        is the fairest way to judge whether today is cheap or dear.
+      </p>
     </div>
   </section>
 </template>
