@@ -4,6 +4,10 @@ import { cols, stamp } from './table'
 import type { Quote, Src } from './types'
 
 const URL_ = 'https://www.nationstrust.com/exchange-rates'
+// The www host sits behind CloudFront, whose WAF rejects every cloud/CI egress
+// IP with a 403. The apex resolves straight to the origin and serves the same
+// page, so we link users to www but scrape the apex.
+const FETCH = 'https://nationstrust.com/exchange-rates'
 
 export const ntb: Src = {
   id: 'ntb',
@@ -13,7 +17,7 @@ export const ntb: Src = {
   kind: 'bank',
 
   async run(): Promise<Quote> {
-    const html = await (await get(URL_)).text()
+    const html = await (await get(FETCH)).text()
     // Seven numeric columns: notes, demand draft, TT, then a trailing import
     // bill rate that would poison a "last six columns" read.
     const q = cols(html, { n: 7, nBuy: 0, nSell: 1, ttBuy: 4, ttSell: 5 })
