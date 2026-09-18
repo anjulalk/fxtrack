@@ -15,10 +15,10 @@ import {
   cbslSeries,
   clearPicks,
   icon,
-  live,
   mkt,
   mode,
   picked,
+  rows,
   toggle,
   win,
   WINDOWS,
@@ -165,7 +165,7 @@ watch(mode, paint)
         <div class="ui mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-faint">
           <span class="flex items-center gap-1.5">
             <span class="h-0.5 w-4 rounded-full" :class="mode === 'buy' ? 'bg-buy' : 'bg-sell'" />
-            Best of {{ live.length }} banks
+            Best of {{ rows.length }} banks
           </span>
           <span v-if="refData.length" class="flex items-center gap-1.5">
             <span class="h-0 w-4 border-t border-dashed border-mute/60" />

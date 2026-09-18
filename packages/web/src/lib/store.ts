@@ -77,8 +77,8 @@ export const bankMap = computed(() => {
 
 /**
  * Scrapes run four times a day, so the longest honest gap is the ~15h
- * overnight one. A full day with no fresh read means the bank is blocking us
- * and the number on screen is last-known, not current.
+ * overnight one. A full day with no fresh read means the number we hold is
+ * last-known rather than current, so the bank is dropped from the board.
  */
 const STALE = 24 * 3600
 
@@ -94,35 +94,20 @@ export function icon(id: string): string {
 }
 
 /** Retail banks only; the central bank rate is a reference, not a dealable price. */
-const split = computed<{ live: Row[]; old: Row[] }>(() => {
+export const rows = computed<Row[]>(() => {
   const l = latest.value
-  if (!l) return { live: [], old: [] }
-
-  const retail = l.rates.filter((r) => bankMap.value.get(r.bank)?.kind === 'bank')
+  if (!l) return []
   const s = stale.value
-  const live = rank(
-    retail.filter((r) => !s.has(r.bank)),
+  return rank(
+    l.rates.filter((r) => bankMap.value.get(r.bank)?.kind === 'bank' && !s.has(r.bank)),
     mode.value,
     kind.value,
   )
-  const old = rank(
-    retail.filter((r) => s.has(r.bank)),
-    mode.value,
-    kind.value,
-  )
-
-  const top = live[0]?.v
-  if (top != null) for (const r of old) r.gap = Math.abs(r.v - top)
-  return { live, old }
 })
 
-/** Frozen quotes rank last and never set the benchmark. */
-export const rows = computed(() => [...split.value.live, ...split.value.old])
-export const live = computed(() => split.value.live)
-
-export const best = computed(() => split.value.live[0] ?? null)
+export const best = computed(() => rows.value[0] ?? null)
 export const worst = computed(() => {
-  const f = split.value.live
+  const f = rows.value
   return f[f.length - 1] ?? null
 })
 

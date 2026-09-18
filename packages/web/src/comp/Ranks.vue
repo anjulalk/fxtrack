@@ -2,13 +2,12 @@
 import { pick } from '@fxtrack/shared'
 import { computed } from 'vue'
 import { ago, DASH, rate } from '../lib/fmt'
-import { bankMap, icon, kind, latest, live, mode, picks, rows, stale, tint, toggle } from '../lib/store'
+import { bankMap, icon, kind, latest, mode, picks, rows, tint, toggle } from '../lib/store'
 
 const head = computed(() => (mode.value === 'buy' ? 'You pay' : 'You get'))
 const accent = computed(() => (mode.value === 'buy' ? 'text-buy' : 'text-sell'))
 
 const on = (id: string) => picks.value.includes(id)
-const old = (id: string) => stale.value.has(id)
 
 function name(id: string): string {
   return bankMap.value.get(id)?.name ?? id
@@ -27,9 +26,8 @@ const missing = computed(() => {
     .map((r) => name(r.bank))
 })
 
-const frozen = computed(() =>
-  rows.value.filter((r) => old(r.rate.bank)).map((r) => name(r.rate.bank)),
-)
+const LIST = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' })
+const list = (a: string[]) => LIST.format(a)
 
 const cbsl = computed(() => latest.value?.rates.find((r) => bankMap.value.get(r.bank)?.kind === 'cb') ?? null)
 
@@ -62,7 +60,7 @@ const sub = computed(() =>
             v-for="(r, i) in rows"
             :key="r.rate.bank"
             class="cursor-pointer border-b border-hair transition last:border-0 hover:bg-wash"
-            :class="[on(r.rate.bank) && 'bg-wash', old(r.rate.bank) && 'opacity-70']"
+            :class="on(r.rate.bank) && 'bg-wash'"
             @click="toggle(r.rate.bank)"
           >
             <td class="py-3 pl-5 pr-3 sm:pl-6">
@@ -88,14 +86,13 @@ const sub = computed(() =>
 
                 <span
                   class="num w-3 shrink-0 text-xs"
-                  :class="old(r.rate.bank) ? 'text-faint/60' : i === 0 ? 'text-gold' : 'text-faint'"
-                >{{ old(r.rate.bank) ? DASH : i + 1 }}</span>
+                  :class="i === 0 ? 'text-gold' : 'text-faint'"
+                >{{ i + 1 }}</span>
 
                 <img
                   :src="icon(r.rate.bank)"
                   alt=""
                   class="h-5 w-5 shrink-0 rounded-[5px] object-contain"
-                  :class="old(r.rate.bank) && 'grayscale'"
                   loading="lazy"
                 />
 
@@ -108,30 +105,18 @@ const sub = computed(() =>
                   @click.stop
                 >{{ name(r.rate.bank) }}</a>
                 <span v-else class="font-medium text-ink">{{ name(r.rate.bank) }}</span>
-
-                <span
-                  v-if="old(r.rate.bank)"
-                  class="ui shrink-0 rounded-full border border-gold/40 bg-gold/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold"
-                  title="This bank blocks our scraper, so this is its last confirmed quote"
-                >stale</span>
               </div>
             </td>
 
-            <td
-              class="num px-3 py-3 text-right"
-              :class="old(r.rate.bank) ? 'text-mute' : i === 0 ? accent : 'text-ink'"
-            >
+            <td class="num px-3 py-3 text-right" :class="i === 0 ? accent : 'text-ink'">
               {{ rate(r.v) }}
             </td>
 
             <td class="num px-3 py-3 text-right text-xs text-faint">
-              {{ old(r.rate.bank) ? DASH : r.gap === 0 ? 'best' : `+${rate(r.gap)}` }}
+              {{ r.gap === 0 ? 'best' : `+${rate(r.gap)}` }}
             </td>
 
-            <td
-              class="ui py-3 pl-3 pr-5 text-right text-xs sm:pr-6"
-              :class="old(r.rate.bank) ? 'text-gold' : 'text-faint'"
-            >
+            <td class="ui py-3 pl-3 pr-5 text-right text-xs text-faint sm:pr-6">
               {{ ago(r.rate.ts) }}
             </td>
           </tr>
@@ -146,7 +131,7 @@ const sub = computed(() =>
     </div>
 
     <div
-      v-if="cbsl || missing.length || frozen.length"
+      v-if="cbsl || missing.length"
       class="space-y-2 border-t border-hair bg-wash/50 px-5 py-4 text-[13px] leading-snug text-mute sm:px-6"
     >
       <p v-if="cbsl">
@@ -154,20 +139,13 @@ const sub = computed(() =>
         <span class="num text-ink">{{ cbsl.mid == null ? DASH : rate(cbsl.mid) }}</span>
         &middot; a reference for where the market sits, not a price you can deal at.
       </p>
-      <p v-if="frozen.length">
-        <span class="font-semibold text-ink">{{ frozen.join(' and ') }}</span>
-        {{ frozen.length > 1 ? 'block' : 'blocks' }} automated access from our servers, so
-        {{ frozen.length > 1 ? 'those rates are' : 'that rate is' }} the last quote we could
-        confirm. {{ frozen.length > 1 ? 'They are' : 'It is' }} ranked last and left out of the
-        comparison above.
-      </p>
       <p v-if="missing.length">
-        {{ missing.join(', ') }} {{ missing.length > 1 ? 'do' : 'does' }} not publish this
+        {{ list(missing) }} {{ missing.length > 1 ? 'do' : 'does' }} not publish this
         particular rate, so {{ missing.length > 1 ? 'they are' : 'it is' }} not listed here.
       </p>
       <p class="text-faint">
-        Rates shown are for {{ live.length }}
-        {{ live.length === 1 ? 'bank' : 'banks' }} currently reporting.
+        Rates shown are for {{ rows.length }}
+        {{ rows.length === 1 ? 'bank' : 'banks' }} currently reporting.
       </p>
     </div>
   </section>

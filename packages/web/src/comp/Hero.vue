@@ -6,8 +6,8 @@ import {
   bankMap,
   best,
   icon,
-  live,
   mode,
+  rows,
   save,
   trendGrade,
   win,
@@ -105,7 +105,7 @@ const side = computed(() =>
     <div class="mt-8 grid gap-3 sm:grid-cols-3">
       <div class="rounded-xl border border-hair bg-wash px-4 py-3">
         <p class="label text-faint">Banks compared</p>
-        <p class="num mt-1.5 text-xl text-ink">{{ live.length }}</p>
+        <p class="num mt-1.5 text-xl text-ink">{{ rows.length }}</p>
       </div>
       <div class="rounded-xl border border-hair bg-wash px-4 py-3">
         <p class="label text-faint">Best vs worst</p>
