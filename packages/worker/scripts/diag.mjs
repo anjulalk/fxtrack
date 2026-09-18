@@ -11,8 +11,6 @@ const CHROME =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
 
 const VARIANTS = {
-  bare: { 'user-agent': CHROME },
-
   current: {
     'user-agent': CHROME,
     accept: 'text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8',
@@ -37,10 +35,6 @@ const VARIANTS = {
     'cache-control': 'max-age=0',
   },
 
-  googlebot: {
-    'user-agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-    accept: 'text/html,application/xhtml+xml,*/*;q=0.8',
-  },
 }
 
 const WAF = ['server', 'cf-ray', 'cf-mitigated', 'x-iinfo', 'x-sucuri-id', 'x-cdn', 'via']
@@ -68,9 +62,27 @@ for (const [id, url] of Object.entries(URLS)) {
         .join(' ')
       const body = await r.text()
       console.log(`${pad(id, 9)} ${pad(name, 10)} ${r.status}  ${pad(body.length, 8)} ${tags}`)
+      if (!r.ok) console.log(`    ${body.replace(/\s+/g, ' ').slice(0, 320)}`)
     } catch (e) {
       console.log(`${pad(id, 9)} ${pad(name, 10)} ERR  ${e.message}`)
     }
   }
   console.log('')
+}
+
+// Can a public text-extraction relay reach the blocked origins instead?
+console.log('--- relay: r.jina.ai ---')
+for (const [id, url] of Object.entries(URLS)) {
+  if (id === 'sampath') continue
+  try {
+    const r = await fetch(`https://r.jina.ai/${url}`, {
+      headers: { 'user-agent': CHROME, 'x-respond-with': 'html' },
+      signal: AbortSignal.timeout(45_000),
+    })
+    const body = await r.text()
+    const hit = /\d{2,3}\.\d{2,4}/.test(body)
+    console.log(`${pad(id, 9)} ${r.status}  ${pad(body.length, 8)} numbers=${hit}`)
+  } catch (e) {
+    console.log(`${pad(id, 9)} ERR  ${e.message}`)
+  }
 }
