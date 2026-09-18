@@ -5,6 +5,7 @@ import {
   amount,
   bankMap,
   best,
+  bestRows,
   icon,
   kind,
   mode,
@@ -46,8 +47,12 @@ const tone = computed(() => {
   }
 })
 
-const id = computed(() => best.value?.rate.bank ?? null)
-const bank = computed(() => (id.value ? (bankMap.value.get(id.value)?.name ?? id.value) : null))
+const leaders = computed(() =>
+  bestRows.value.map((r) => ({
+    id: r.rate.bank,
+    name: bankMap.value.get(r.rate.bank)?.name ?? r.rate.bank,
+  })),
+)
 
 const spread = computed(() => {
   const b = best.value
@@ -82,14 +87,16 @@ const side = computed(() =>
           <span>You {{ verb }}</span>
           <span class="num text-ink">{{ rate(best?.v) }}</span>
           <span>per dollar at</span>
-          <span v-if="bank" class="inline-flex items-center gap-1.5 font-semibold text-ink">
-            <img
-              :src="icon(id!)"
-              :alt="''"
-              class="h-[18px] w-[18px] rounded-[4px] object-contain"
-              loading="lazy"
-            />
-            {{ bank }}
+          <span v-if="leaders.length" class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold text-ink">
+            <span v-for="(b, i) in leaders" :key="b.id" class="inline-flex items-center gap-1.5">
+              <img
+                :src="icon(b.id)"
+                :alt="''"
+                class="h-[18px] w-[18px] rounded-[4px] object-contain"
+                loading="lazy"
+              />
+              {{ b.name }}<span v-if="i < leaders.length - 1" class="font-normal text-mute">or</span>
+            </span>
           </span>
           <span v-else>{{ DASH }}</span>
         </p>

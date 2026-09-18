@@ -31,6 +31,12 @@ export const winBusy = ref(false)
 export const err = ref<string | null>(null)
 
 const cache = new Map<WinId, Hist>()
+const now = ref(Math.floor(Date.now() / 1000))
+if (typeof window !== 'undefined') {
+  window.setInterval(() => {
+    now.value = Math.floor(Date.now() / 1000)
+  }, 60_000)
+}
 
 /** One snapshot file per window, kept after the first fetch so switching back is instant. */
 async function pull(w: WinId): Promise<void> {
@@ -91,7 +97,7 @@ const STALE = 24 * 3600
 export const stale = computed(() => {
   const l = latest.value
   const s = new Set<string>()
-  if (l) for (const r of l.rates) if (l.gen - r.ts > STALE) s.add(r.bank)
+  if (l) for (const r of l.rates) if (now.value - r.ts > STALE) s.add(r.bank)
   return s
 })
 
@@ -113,11 +119,19 @@ export const rows = computed<Row[]>(() => {
   return out.map((r) => ({ ...r, v: quote(r.v, kind.value), gap: quote(r.gap, kind.value) }))
 })
 
-export const best = computed(() => rows.value[0] ?? null)
-export const worst = computed(() => {
-  const f = rows.value
-  return f[f.length - 1] ?? null
+export const bestRows = computed<Row[]>(() => {
+  const top = rows.value[0]?.v
+  return top == null ? [] : rows.value.filter((r) => r.v === top)
 })
+
+export const worstRows = computed<Row[]>(() => {
+  const f = rows.value
+  const bottom = f[f.length - 1]?.v
+  return bottom == null ? [] : f.filter((r) => r.v === bottom)
+})
+
+export const best = computed(() => bestRows.value[0] ?? null)
+export const worst = computed(() => worstRows.value[0] ?? null)
 
 /** Spread between the best and worst bank right now, on the amount entered. */
 export const save = computed(() => {
@@ -137,6 +151,7 @@ export const bestSeries = computed<{ days: string[]; vals: Col }>(() => {
   const cols: Col[] = []
   for (const [id, s] of Object.entries(h.ser)) {
     if (bankMap.value.get(id)?.kind !== 'bank') continue
+    if (stale.value.has(id)) continue
     cols.push(s[f])
   }
 
@@ -246,7 +261,7 @@ export const picked = computed<Line[]>(() => {
 
   return picks.value.flatMap((id) => {
     const s = h.ser[id]
-    if (!s) return []
+    if (!s || stale.value.has(id)) return []
     const raw = s[f]
     return [
       {

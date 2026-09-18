@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import Compare from './comp/Compare.vue'
 import Chart from './comp/Chart.vue'
 import Conv from './comp/Conv.vue'
 import Hero from './comp/Hero.vue'
@@ -129,6 +130,7 @@ onMounted(load)
 
     <main v-else class="mt-7 space-y-5">
       <Hero />
+      <Compare />
       <Chart />
       <div class="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
         <Ranks />
