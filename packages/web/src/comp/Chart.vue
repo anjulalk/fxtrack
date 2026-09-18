@@ -169,7 +169,7 @@ watch(mode, paint)
           </span>
           <span v-if="refData.length" class="flex items-center gap-1.5">
             <span class="h-0 w-4 border-t border-dashed border-mute/60" />
-            Market average (Central Bank)
+            Central Bank mid rate
           </span>
         </div>
       </div>
@@ -222,7 +222,7 @@ watch(mode, paint)
     </p>
 
     <div class="mt-4 border-t border-hair pt-4">
-      <p class="label text-faint">Market average over this window</p>
+      <p class="label text-faint">Market rate over this window</p>
       <div class="mt-2.5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div v-for="s in [
           { k: 'Low', v: mkt.min },
@@ -237,8 +237,8 @@ watch(mode, paint)
         </div>
       </div>
       <p class="mt-3 text-[13px] leading-snug text-faint">
-        Drawn from the Central Bank's daily indicative rate, which reaches back two decades and
-        is the fairest way to judge whether today is cheap or dear.
+        Drawn from the Central Bank's indicative spot rate, published every trading day since
+        2010, which is the fairest way to judge whether today is cheap or dear.
       </p>
     </div>
   </section>

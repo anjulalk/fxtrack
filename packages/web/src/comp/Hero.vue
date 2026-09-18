@@ -95,7 +95,7 @@ const side = computed(() =>
         v-if="signal"
         class="ui shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold"
         :class="tone"
-        :title="'Based on where the market average sits in its ' + winLabel + ' range'"
+        :title="'Based on where the market rate sits in its ' + winLabel + ' range'"
       >
         {{ signal }}
         <span class="font-normal opacity-75">&middot; {{ winLabel }} market range</span>

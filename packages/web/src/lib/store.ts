@@ -67,6 +67,11 @@ watch(win, (w) => {
   })
 })
 
+/** A card can only ever buy dollars, so that board has no sell side. */
+watch(mode, (m) => {
+  if (m === 'sell' && kind.value === 'card') kind.value = 'tt'
+})
+
 export const winDays = computed(() => WINDOWS.find((w) => w.id === win.value)!.days)
 
 export const bankMap = computed(() => {
@@ -148,16 +153,18 @@ export const bestSeries = computed<{ days: string[]; vals: Col }>(() => {
 })
 
 /**
- * Central bank daily average, on the same axis as `bestSeries`. This is a
- * market reference spanning 20 years, not a dealable rate at any one bank.
- * Only TT is published, so cash mode still charts the wire average.
+ * CBSL's indicative spot mid, on the same axis as `bestSeries`. It is the
+ * benchmark the market prices off, not a dealable rate, so the distance between
+ * a bank's line and this one is the margin that bank is charging.
+ *
+ * A mid has no buy/sell side, so the baseline is the same line in either mode.
  */
 export const cbslSeries = computed<{ days: string[]; vals: Col }>(() => {
   const h = hist.value
   const s = h?.ser[CB]
   if (!h || !s) return { days: [], vals: [] }
 
-  const vals = s[field(mode.value, 'tt')]
+  const vals = s.mid
   const n = winDays.value
   if (n >= h.days.length) return { days: h.days, vals }
   return { days: h.days.slice(-n), vals: vals.slice(-n) }

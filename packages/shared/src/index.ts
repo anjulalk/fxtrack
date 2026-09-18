@@ -1,8 +1,8 @@
 /** What the user is trying to do with their dollars. */
 export type Mode = 'buy' | 'sell'
 
-/** Which board a quote came from: wire transfer vs physical cash. */
-export type Kind = 'tt' | 'note'
+/** Which board a quote came from: wire transfer, physical cash, or a card payment. */
+export type Kind = 'tt' | 'note' | 'card'
 
 export interface Bank {
   id: string
@@ -65,10 +65,11 @@ export type Field = (typeof FIELDS)[number]
 /**
  * The rate that matters to the user. A customer buying USD pays the bank's
  * selling rate; a customer selling USD receives the bank's buying rate.
+ * Card settlements convert off the wire board, then carry their own fees.
  */
 export function field(m: Mode, k: Kind): Field {
-  if (k === 'tt') return m === 'buy' ? 'ttSell' : 'ttBuy'
-  return m === 'buy' ? 'nSell' : 'nBuy'
+  if (k === 'note') return m === 'buy' ? 'nSell' : 'nBuy'
+  return m === 'buy' ? 'ttSell' : 'ttBuy'
 }
 
 export function pick(r: Rate, m: Mode, k: Kind): number | null {
