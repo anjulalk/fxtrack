@@ -49,10 +49,10 @@ onMounted(load)
   <div class="mx-auto w-full max-w-[80rem] px-6 pt-6 sm:px-14 sm:pt-10 md:px-24 lg:px-32">
     <header class="pb-6 sm:pb-10">
       <div class="flex flex-wrap items-baseline justify-between gap-4">
-        <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h1 class="ui text-xl font-semibold">
           fx<span class="text-clay-strong">track</span>
         </h1>
-        <p v-if="stamp" class="ui shrink-0 text-xs text-mute">
+        <p v-if="stamp" class="ui shrink-0 text-sm text-mute">
           Last checked {{ stamp }} <span class="text-mute">&middot; Colombo time</span>
         </p>
       </div>
