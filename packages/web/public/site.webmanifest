@@ -1,0 +1,14 @@
+{
+  "name": "fxtrack - USD to LKR bank rates",
+  "short_name": "fxtrack",
+  "description": "Every Sri Lankan bank's US dollar rate in one place.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#faf9f6",
+  "theme_color": "#faf9f6",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

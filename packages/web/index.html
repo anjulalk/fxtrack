@@ -3,22 +3,99 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fxtrack — USD/LKR bank rates, tracked hourly</title>
+    <title>USD to LKR Bank Rates in Sri Lanka | fxtrack</title>
     <meta
       name="description"
-      content="Live and historical USD to LKR buying and selling rates from Sri Lankan banks, updated every hour. Find the best rate before you buy or sell dollars."
+      content="Compare live and historical USD to LKR buying and selling rates from Sri Lankan banks, updated through the day. Find the best bank to buy or sell dollars."
     />
+    <link rel="canonical" href="https://fxtrack.anjula.dev/" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+    <meta name="author" content="Anjula Karunarathne" />
     <meta name="theme-color" content="#faf9f6" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="fxtrack" />
+    <meta property="og:locale" content="en_LK" />
+    <meta property="og:url" content="https://fxtrack.anjula.dev/" />
+    <meta property="og:title" content="USD to LKR Bank Rates in Sri Lanka" />
+    <meta
+      property="og:description"
+      content="Every bank's US dollar rate in Sri Lanka, in one place. Buying and selling rates, the best bank to deal with, and the market range to judge the day."
+    />
+    <meta property="og:image" content="https://fxtrack.anjula.dev/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="fxtrack - every bank's US dollar rate in Sri Lanka, in one place"
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="USD to LKR Bank Rates in Sri Lanka | fxtrack" />
+    <meta
+      name="twitter:description"
+      content="Buying and selling rates from Sri Lankan banks in one place, with the best bank to deal with and the market range to judge the day."
+    />
+    <meta name="twitter:image" content="https://fxtrack.anjula.dev/og.png" />
+
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap"
       rel="stylesheet"
     />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://fxtrack.anjula.dev/#site",
+            "url": "https://fxtrack.anjula.dev/",
+            "name": "fxtrack",
+            "description": "USD to LKR buying and selling rates from Sri Lankan banks, tracked through the day.",
+            "inLanguage": "en",
+            "publisher": { "@id": "https://fxtrack.anjula.dev/#author" }
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://fxtrack.anjula.dev/#app",
+            "name": "fxtrack",
+            "url": "https://fxtrack.anjula.dev/",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Web",
+            "isAccessibleForFree": true,
+            "description": "Compare published US dollar buying and selling rates across Sri Lankan banks, see the best bank to deal with today, and judge the rate against its market range.",
+            "author": { "@id": "https://fxtrack.anjula.dev/#author" },
+            "about": { "@type": "Thing", "name": "USD/LKR exchange rates" },
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "LKR" }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://fxtrack.anjula.dev/#author",
+            "name": "Anjula Karunarathne",
+            "url": "https://anjula.dev"
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>
+    <noscript>
+      <h1>fxtrack: USD to LKR bank rates in Sri Lanka</h1>
+      <p>
+        fxtrack puts every Sri Lankan bank's published US dollar rate in one place. It compares
+        buying and selling rates for telegraphic transfers, cash notes and card payments, shows
+        which bank is offering the best rate right now, and tracks each rate against the Central
+        Bank of Sri Lanka's indicative rate.
+      </p>
+      <p>Rates are read from the banks' own published pages. Enable JavaScript to use the app.</p>
+    </noscript>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

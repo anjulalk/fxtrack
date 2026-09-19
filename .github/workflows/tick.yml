@@ -51,6 +51,10 @@ jobs:
         run: npm run snap
 
       - name: Build
+        env:
+          # Served from the root of the custom subdomain (see public/CNAME).
+          BASE_PATH: /
+          SITE_URL: https://fxtrack.anjula.dev
         run: npm run build
 
       - uses: actions/upload-pages-artifact@v3

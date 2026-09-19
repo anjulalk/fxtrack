@@ -1,5 +1,10 @@
 {
   "name": "fxtrack",
+  "description": "USD/LKR bank rates for Sri Lanka",
+  "author": {
+    "name": "Anjula Karunarathne",
+    "url": "https://anjula.dev"
+  },
   "private": true,
   "type": "module",
   "workspaces": [

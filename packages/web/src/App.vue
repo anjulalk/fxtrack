@@ -174,9 +174,16 @@ onMounted(load)
         </div>
       </div>
       <p class="mt-7 border-t border-hair pt-5 text-xs text-faint">
-        fxtrack is an independent project and is not affiliated with, endorsed by, or operated
-        by any bank listed. Bank names and marks belong to their respective owners and are used
-        only to identify the source of each rate.
+        An independent project by
+        <a
+          class="underline underline-offset-2 hover:text-ink"
+          href="https://anjula.dev"
+          target="_blank"
+          rel="noreferrer"
+          >Anjula Karunarathne</a
+        >. Not affiliated with, endorsed by, or operated by any bank listed. Bank names and
+        marks belong to their respective owners and are used only to identify the source of
+        each rate.
       </p>
     </footer>
   </div>
