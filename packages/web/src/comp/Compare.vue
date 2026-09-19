@@ -50,7 +50,7 @@ const items = computed<Item[]>(() => {
   <section v-if="items.length" class="card rise overflow-hidden">
     <div class="px-5 pt-5 sm:px-6">
       <h2 class="text-lg font-semibold text-ink">Best + selected banks</h2>
-      <p class="mt-0.5 text-[13px] text-mute">
+      <p class="mt-0.5 text-sm text-mute">
         Current and {{ winLabel }} stats for every tied-best bank and each bank in your comparison.
       </p>
     </div>
@@ -58,7 +58,7 @@ const items = computed<Item[]>(() => {
     <div class="mt-4 overflow-x-auto">
       <table class="w-full min-w-[680px] text-sm">
         <thead>
-          <tr class="label border-y border-hair bg-wash/60 text-faint">
+          <tr class="label border-y border-hair bg-wash/60 text-soft">
             <th class="py-2.5 pl-5 pr-3 text-left font-medium sm:pl-6">Bank</th>
             <th class="px-3 py-2.5 text-right font-medium">Now</th>
             <th class="px-3 py-2.5 text-right font-medium">Low</th>
@@ -79,7 +79,7 @@ const items = computed<Item[]>(() => {
                 />
                 <span class="font-medium text-ink">{{ bankMap.get(item.row.rate.bank)?.name ?? item.row.rate.bank }}</span>
                 <span v-if="item.leader" class="label rounded-full bg-gold/10 px-1.5 py-1 text-gold">Best</span>
-                <span v-if="item.selected" class="label rounded-full bg-brand/8 px-1.5 py-1 text-brand">Selected</span>
+                <span v-if="item.selected" class="label rounded-full bg-brand/8 px-1.5 py-1 text-clay-strong">Selected</span>
               </div>
             </td>
             <td class="num px-3 py-3 text-right font-semibold text-ink">{{ rate(item.row.v) }}</td>
@@ -95,12 +95,12 @@ const items = computed<Item[]>(() => {
     <div class="border-t border-hair bg-wash/50 px-5 py-4 sm:px-6">
       <div class="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p class="label text-faint">Add to comparison</p>
-          <p class="mt-1 text-[13px] text-mute">These banks stay synced with the chart and calculator.</p>
+          <p class="label text-soft">Add to comparison</p>
+          <p class="mt-1 text-sm text-mute">These banks stay synced with the chart and calculator.</p>
         </div>
         <button
           type="button"
-          class="ui text-xs text-faint underline-offset-2 transition hover:text-ink hover:underline"
+          class="ui text-xs text-soft underline-offset-2 transition hover:text-ink hover:underline"
           @click="clearPicks"
         >
           Clear selected
@@ -110,7 +110,7 @@ const items = computed<Item[]>(() => {
         <label
           v-for="r in rows"
           :key="r.rate.bank"
-          class="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-card px-3 py-2 text-[13px] transition hover:border-faint/60"
+          class="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-card px-3 py-2 text-sm transition hover:border-faint/60"
         >
           <input
             type="checkbox"

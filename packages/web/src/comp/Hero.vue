@@ -37,7 +37,7 @@ const tone = computed(() => {
     case 'great':
       return 'border-up/35 bg-up/8 text-up'
     case 'good':
-      return 'border-brand/35 bg-brand/8 text-brand'
+      return 'border-brand/35 bg-brand/8 text-clay-strong'
     case 'fair':
       return 'border-gold/40 bg-gold/10 text-gold'
     case 'poor':
@@ -73,17 +73,17 @@ const side = computed(() =>
   <section class="card rise p-6 sm:p-8">
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div class="min-w-0">
-        <p class="label text-faint">
+        <p class="label text-soft">
           {{ kind === 'card' ? 'Estimated card rate right now' : 'Best rate right now' }}
         </p>
         <div class="mt-3 flex items-end gap-3">
           <span class="fig text-6xl font-semibold leading-none sm:text-7xl" :class="accent">
             {{ rate(best?.v) }}
           </span>
-          <span class="ui pb-1.5 text-xs text-faint">LKR per USD</span>
+          <span class="ui pb-1.5 text-xs text-soft">LKR per USD</span>
         </div>
 
-        <p class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] text-mute">
+        <p class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-mute">
           <span>You {{ verb }}</span>
           <span class="num text-ink">{{ rate(best?.v) }}</span>
           <span>per dollar at</span>
@@ -100,7 +100,7 @@ const side = computed(() =>
           </span>
           <span v-else>{{ DASH }}</span>
         </p>
-        <p class="mt-1.5 text-[13px] text-faint">That is {{ side }} today.</p>
+        <p class="mt-1.5 text-sm text-soft">That is {{ side }} today.</p>
       </div>
 
       <span
@@ -115,23 +115,23 @@ const side = computed(() =>
     </div>
 
     <div class="mt-8 grid gap-3 sm:grid-cols-3">
-      <div class="rounded-xl border border-hair bg-wash px-4 py-3">
-        <p class="label text-faint">Banks compared</p>
+      <div class="rounded-[var(--radius-card)] border border-hair bg-wash px-4 py-3">
+        <p class="label text-soft">Banks compared</p>
         <p class="num mt-1.5 text-xl text-ink">{{ rows.length }}</p>
       </div>
-      <div class="rounded-xl border border-hair bg-wash px-4 py-3">
-        <p class="label text-faint">Best vs worst</p>
+      <div class="rounded-[var(--radius-card)] border border-hair bg-wash px-4 py-3">
+        <p class="label text-soft">Best vs worst</p>
         <p class="num mt-1.5 text-xl text-ink">
           {{ spread == null ? DASH : rate(spread) }}
         </p>
       </div>
-      <div class="rounded-xl border border-hair bg-wash px-4 py-3">
-        <p class="label text-faint">Saved on ${{ money(amount) }}</p>
+      <div class="rounded-[var(--radius-card)] border border-hair bg-wash px-4 py-3">
+        <p class="label text-soft">Saved on ${{ money(amount) }}</p>
         <p class="num mt-1.5 text-xl" :class="accent">Rs {{ money(save) }}</p>
       </div>
     </div>
 
-    <p class="mt-3 text-[13px] leading-snug text-faint">
+    <p class="mt-3 text-sm leading-snug text-soft">
       "Saved" is what the spread is worth to you: the difference between dealing with the best
       bank and the worst one on the amount you entered below.
     </p>

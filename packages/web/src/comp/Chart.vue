@@ -171,8 +171,8 @@ watch(mode, paint)
     <div class="flex flex-wrap items-start justify-between gap-3">
       <div>
         <h2 class="text-lg font-semibold text-ink">Best available rate</h2>
-        <p class="mt-0.5 text-[13px] text-mute">{{ lede }}</p>
-        <div class="ui mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-faint">
+        <p class="mt-0.5 text-sm text-mute">{{ lede }}</p>
+        <div class="ui mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-soft">
           <span class="flex items-center gap-1.5">
             <span class="h-0.5 w-4 rounded-full" :class="mode === 'buy' ? 'bg-buy' : 'bg-sell'" />
             Best of {{ rows.length }} banks
@@ -209,7 +209,7 @@ watch(mode, paint)
         <span class="text-ink">{{ p.name }}</span>
         <button
           type="button"
-          class="rounded-full px-1 leading-none text-faint transition hover:text-ink"
+          class="rounded-full px-1 leading-none text-soft transition hover:text-ink"
           :aria-label="`Remove ${p.name}`"
           @click="toggle(p.id)"
         >
@@ -218,7 +218,7 @@ watch(mode, paint)
       </span>
       <button
         type="button"
-        class="ui ml-1 text-xs text-faint underline-offset-2 transition hover:text-ink hover:underline"
+        class="ui ml-1 text-xs text-soft underline-offset-2 transition hover:text-ink hover:underline"
         @click="clearPicks"
       >
         Clear
@@ -227,12 +227,12 @@ watch(mode, paint)
 
     <div ref="host" class="mt-4 h-[280px] w-full sm:h-[340px]" />
 
-    <p v-if="!data.length && !refData.length" class="-mt-32 text-center text-sm text-faint">
+    <p v-if="!data.length && !refData.length" class="-mt-32 text-center text-sm text-soft">
       No history yet for this window.
     </p>
 
     <div class="mt-4 border-t border-hair pt-4">
-      <p class="label text-faint">Market rate over this window</p>
+      <p class="label text-soft">Market rate over this window</p>
       <div class="mt-2.5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div v-for="s in [
           { k: 'Low', v: mkt.min },
@@ -240,13 +240,13 @@ watch(mode, paint)
           { k: 'Average', v: mkt.avg },
           { k: 'Change', v: mkt.chg },
         ]" :key="s.k">
-          <p class="label text-faint">{{ s.k }}</p>
+          <p class="label text-soft">{{ s.k }}</p>
           <p class="num mt-1 text-sm text-ink">
             {{ s.v == null ? DASH : rate(s.v) }}
           </p>
         </div>
       </div>
-      <p class="mt-3 text-[13px] leading-snug text-faint">
+      <p class="mt-3 text-sm leading-snug text-soft">
         <span v-if="win === '1d'">
           Shows the scheduled snapshots received in the last 24 hours; unchanged bank quotes are
           carried forward between runs.

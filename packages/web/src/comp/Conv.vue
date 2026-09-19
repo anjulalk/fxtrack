@@ -44,13 +44,13 @@ function set(e: Event) {
 <template>
   <section class="card rise p-5 sm:p-6">
     <h2 class="text-lg font-semibold text-ink">Converter</h2>
-    <p class="mt-0.5 text-[13px] text-mute">{{ intro }}</p>
+    <p class="mt-0.5 text-sm text-mute">{{ intro }}</p>
 
-    <label class="label mt-5 block text-faint">{{ heading }}</label>
+    <label class="label mt-5 block text-soft">{{ heading }}</label>
     <div
-      class="mt-2 flex items-center gap-2 rounded-xl border border-line bg-wash px-3.5 py-2.5 transition focus-within:border-brand/60 focus-within:bg-card"
+      class="mt-2 flex items-center gap-2 rounded-[var(--radius-card)] border border-line bg-wash px-3.5 py-2.5 transition focus-within:border-brand/60 focus-within:bg-card"
     >
-      <span class="ui text-sm text-faint">$</span>
+      <span class="ui text-sm text-soft">$</span>
       <input
         :value="amount"
         type="number"
@@ -70,7 +70,7 @@ function set(e: Event) {
         class="ui rounded-lg border px-2.5 py-1 text-xs transition"
         :class="
           amount === p
-            ? 'border-brand/45 bg-brand/8 text-brand'
+            ? 'border-brand/45 bg-brand/8 text-clay-strong'
             : 'border-line text-mute hover:border-faint/60 hover:text-ink'
         "
         @click="amount = p"
@@ -79,8 +79,8 @@ function set(e: Event) {
       </button>
     </div>
 
-    <div class="mt-5 rounded-xl border border-hair bg-wash p-4">
-      <p class="label text-faint">{{ result }}</p>
+    <div class="mt-5 rounded-[var(--radius-card)] border border-hair bg-wash p-4">
+      <p class="label text-soft">{{ result }}</p>
       <div v-if="quotes.length" class="mt-2.5 divide-y divide-hair">
         <div v-for="q in quotes" :key="q.row.rate.bank" class="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
           <div class="flex min-w-0 items-center gap-2">
@@ -89,33 +89,33 @@ function set(e: Event) {
               <p class="truncate font-medium text-ink">
                 {{ q.name }}
                 <span v-if="q.leader" class="label ml-1 rounded-full bg-gold/10 px-1.5 py-1 text-gold">Best</span>
-                <span v-if="q.selected" class="label ml-1 rounded-full bg-brand/8 px-1.5 py-1 text-brand">Selected</span>
+                <span v-if="q.selected" class="label ml-1 rounded-full bg-brand/8 px-1.5 py-1 text-clay-strong">Selected</span>
               </p>
-              <p class="num text-xs text-faint">{{ rate(q.row.v) }} per USD</p>
+              <p class="num text-xs text-soft">{{ rate(q.row.v) }} per USD</p>
             </div>
           </div>
           <p class="num shrink-0 text-lg font-semibold" :class="accent">Rs {{ money(q.total) }}</p>
         </div>
       </div>
-      <p v-else class="num mt-1.5 text-2xl font-semibold text-faint">{{ DASH }}</p>
+      <p v-else class="num mt-1.5 text-2xl font-semibold text-soft">{{ DASH }}</p>
     </div>
 
-    <div v-if="card && quotes.length" class="mt-3 rounded-xl border border-line bg-card px-4 py-3.5">
-      <p class="label text-faint">Card rate estimate</p>
+    <div v-if="card && quotes.length" class="mt-3 card border-line bg-card px-4 py-3.5">
+      <p class="label text-soft">Card rate estimate</p>
       <div class="mt-2 divide-y divide-hair">
-        <div v-for="q in quotes" :key="q.row.rate.bank" class="flex items-center justify-between gap-4 py-2 first:pt-0 last:pb-0 text-[13px] text-mute">
+        <div v-for="q in quotes" :key="q.row.rate.bank" class="flex items-center justify-between gap-4 py-2 first:pt-0 last:pb-0 text-sm text-mute">
           <span class="truncate">{{ q.name }}</span>
           <span class="num shrink-0 text-ink">
             {{ q.base == null ? DASH : `Rs ${rate(q.base)} + ${rate(q.markup)} = ${rate(q.row.v)}` }}
           </span>
         </div>
       </div>
-      <p class="mt-2 text-xs leading-snug text-faint">
+      <p class="mt-2 text-xs leading-snug text-soft">
         No separate network fee, VAT, SSCL or verified stamp-duty line is included.
       </p>
     </div>
 
-    <p v-if="card" class="mt-3 rounded-xl border border-gold/30 bg-gold/8 px-4 py-3 text-[13px] leading-snug text-mute">
+    <p v-if="card" class="mt-3 card border-gold/30 bg-gold/8 px-4 py-3 text-sm leading-snug text-mute">
       <span class="font-semibold text-ink">Choose USD at checkout.</span>
       Paying in LKR through dynamic currency conversion (DCC) can add at least
       <span class="num text-ink">{{ pct(DCC_MARKUP * 100) }}</span>

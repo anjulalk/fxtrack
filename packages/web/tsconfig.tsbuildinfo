@@ -1,1 +1,0 @@
-{"root":["./src/env.d.ts","./src/main.ts","./src/lib/api.ts","./src/lib/fmt.ts","./src/lib/stats.ts","./src/lib/store.ts","./src/app.vue","./src/comp/chart.vue","./src/comp/conv.vue","./src/comp/hero.vue","./src/comp/ranks.vue","./vite.config.ts"],"version":"5.9.3"}

@@ -44,13 +44,13 @@ const sub = computed(() =>
   <section class="card rise overflow-hidden">
     <div class="px-5 pt-5 sm:px-6">
       <h2 class="text-lg font-semibold text-ink">Bank details &amp; health</h2>
-      <p class="mt-0.5 text-[13px] text-mute">{{ sub }}</p>
+      <p class="mt-0.5 text-sm text-mute">{{ sub }}</p>
     </div>
 
     <div class="mt-4 overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="label border-y border-hair bg-wash/60 text-faint">
+          <tr class="label border-y border-hair bg-wash/60 text-soft">
             <th class="py-2.5 pl-5 pr-3 text-left font-medium sm:pl-6">Bank</th>
             <th class="px-3 py-2.5 text-right font-medium">{{ head }}</th>
             <th class="px-3 py-2.5 text-right font-medium">Vs best</th>
@@ -68,7 +68,7 @@ const sub = computed(() =>
               <div class="flex items-center gap-2.5">
                 <span
                   class="num w-5 shrink-0 text-xs"
-                  :class="i === 0 ? 'text-gold' : 'text-faint'"
+                  :class="i === 0 ? 'text-gold' : 'text-soft'"
                 >{{ i + 1 }}</span>
 
                 <img
@@ -83,7 +83,7 @@ const sub = computed(() =>
                   :href="url(r.rate.bank)!"
                   target="_blank"
                   rel="noreferrer"
-                  class="font-medium text-ink transition hover:text-brand"
+                  class="font-medium text-ink transition hover:text-clay-strong"
                   @click.stop
                 >{{ name(r.rate.bank) }}</a>
                 <span v-else class="font-medium text-ink">{{ name(r.rate.bank) }}</span>
@@ -94,21 +94,21 @@ const sub = computed(() =>
               {{ rate(r.v) }}
             </td>
 
-            <td class="num px-3 py-3 text-right text-xs text-faint">
+            <td class="num px-3 py-3 text-right text-xs text-soft">
               {{ r.gap === 0 ? 'best' : `+${rate(r.gap)}` }}
             </td>
 
-            <td class="num px-3 py-3 text-right text-xs text-faint">
+            <td class="num px-3 py-3 text-right text-xs text-soft">
               {{ worstIds.has(r.rate.bank) ? 'worst' : worstRate == null ? DASH : `-${rate(Math.abs(worstRate - r.v))}` }}
             </td>
 
-            <td class="ui py-3 pl-3 pr-5 text-right text-xs text-faint sm:pr-6">
+            <td class="ui py-3 pl-3 pr-5 text-right text-xs text-soft sm:pr-6">
               {{ ago(r.rate.ts) }}
             </td>
           </tr>
 
           <tr v-if="!rows.length">
-            <td colspan="5" class="px-6 py-10 text-center text-sm text-faint">
+            <td colspan="5" class="px-6 py-10 text-center text-sm text-soft">
               No rates available.
             </td>
           </tr>
@@ -118,7 +118,7 @@ const sub = computed(() =>
 
     <div
       v-if="cbsl || missing.length"
-      class="space-y-2 border-t border-hair bg-wash/50 px-5 py-4 text-[13px] leading-snug text-mute sm:px-6"
+      class="space-y-2 border-t border-hair bg-wash/50 px-5 py-4 text-sm leading-snug text-mute sm:px-6"
     >
       <p v-if="cbsl">
         Central Bank indicative mid rate
@@ -129,7 +129,7 @@ const sub = computed(() =>
         {{ list(missing) }} {{ missing.length > 1 ? 'do' : 'does' }} not publish this
         particular rate, so {{ missing.length > 1 ? 'they are' : 'it is' }} not listed here.
       </p>
-      <p class="text-faint">
+      <p class="text-soft">
         Rates shown are for {{ rows.length }}
         {{ rows.length === 1 ? 'bank' : 'banks' }} currently reporting.
       </p>
