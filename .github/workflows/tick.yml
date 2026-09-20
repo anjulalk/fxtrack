@@ -2,9 +2,15 @@ name: tick
 
 on:
   schedule:
-    # 09:40, 12:40, 15:40 and 18:40 Sri Lanka time (UTC+5:30) — covers the
-    # morning publication, midday revisions and the close.
-    - cron: '10 4,7,10,13 * * *'
+    # GitHub's schedule queue is best-effort: runs can be delayed for hours or
+    # dropped silently under load. Each publication window is therefore hit
+    # several times so a missed run is covered by the next. The primary times
+    # are 09:40, 12:40, 15:40 and 18:40 Sri Lanka time (UTC+5:30) — the morning
+    # publication, midday revisions and the close.
+    - cron: '10 4,7,10,13 * * *' # primary
+    - cron: '40 4,7,10,13 * * *' # +30m backup
+    - cron: '10 5,8,11,14 * * *' # +1h backup
+    - cron: '25 5,8,11,14 * * *' # +1h15m backup
   workflow_dispatch:
 
 permissions:
