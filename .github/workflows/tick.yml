@@ -39,6 +39,10 @@ jobs:
       - run: npm ci
 
       - name: Scrape
+        env:
+          # Optional relay for sources whose WAF blocks GitHub's egress IPs.
+          # Unset falls back to the keyless reader (see packages/worker/src/lib/net.ts).
+          FX_PROXY: ${{ secrets.FX_PROXY }}
         run: npm run tick
 
       - name: Commit data
