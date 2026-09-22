@@ -5,6 +5,7 @@ import Chart from './comp/Chart.vue'
 import Conv from './comp/Conv.vue'
 import Hero from './comp/Hero.vue'
 import Ranks from './comp/Ranks.vue'
+import ThemeToggle from './comp/ThemeToggle.vue'
 import { clock } from './lib/fmt'
 import { busy, err, kind, latest, load, mode } from './lib/store'
 
@@ -52,7 +53,7 @@ onMounted(load)
         <h1 class="ui text-xl font-semibold">
           fx<span class="text-clay-strong">track</span>
         </h1>
-        <p v-if="stamp" class="ui shrink-0 text-sm text-mute">
+        <p v-if="stamp" class="ui shrink-0 text-sm text-soft">
           Last checked {{ stamp }} <span class="text-mute">&middot; Colombo time</span>
         </p>
       </div>
@@ -134,22 +135,27 @@ onMounted(load)
     </main>
 
     <footer class="ui py-10 text-sm text-soft">
-      <p>
-        Built by
-        <a
-          class="underline-offset-2 hover:text-ink hover:underline"
-          href="https://anjula.dev"
-          target="_blank"
-          rel="noreferrer"
-          >Anjula Karunarathne</a
-        >.
-      </p>
-      <p class="text-xs">
-        An independent project, not affiliated with, endorsed by, or operated by any bank listed.
-        Bank names and marks belong to their respective owners and are used only to identify the
-        source of each rate. Published rates are indicative, so confirm them with the bank before
-        transacting.
-      </p>
+      <div class="flex items-center justify-between">
+        <div>
+          <p>
+            Built by
+            <a
+              class="underline-offset-2 hover:text-ink hover:underline"
+              href="https://anjula.dev"
+              target="_blank"
+              rel="noreferrer"
+              >Anjula Karunarathne</a
+            >.
+          </p>
+          <p class="text-xs">
+            An independent project, not affiliated with, endorsed by, or operated by any bank listed.
+            Bank names and marks belong to their respective owners and are used only to identify the
+            source of each rate. Published rates are indicative, so confirm them with the bank before
+            transacting.
+          </p>
+        </div>
+        <ThemeToggle />
+      </div>
     </footer>
   </div>
 </template>

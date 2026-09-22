@@ -31,7 +31,9 @@
   --color-up: #157a58;
   --color-down: #b3323f;
   --color-brand: #c1603c;
+  --color-clay: #c1603c;
   --color-clay-strong: #9e4a2d;
+  --color-moss: #78876a;
   --color-gold: #8a6309;
 
   --radius-card: 0.875rem;
@@ -41,6 +43,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   --color-paper: #282622;
   --color-card: #2f2d29;
   --color-line: #5b564c;
@@ -57,8 +61,22 @@
   --color-up: #6cc4a1;
   --color-down: #e08d92;
   --color-brand: #e7966e;
+  --color-clay: #e7966e;
   --color-clay-strong: #d97757;
+  --color-moss: #98a688;
   --color-gold: #d3b45c;
+}
+
+/* The signature page background (see tokens.css and DESIGN.md): two very soft
+   glows, clay from the top-left and moss from the top-right. The glow tokens
+   reference the colour tokens, so dark mode uses the lighter clay and moss
+   without a second set of values. */
+:root {
+  --wash-glow-clay: color-mix(in srgb, var(--color-clay) 5%, transparent);
+  --wash-glow-moss: color-mix(in srgb, var(--color-moss) 4%, transparent);
+  --wash-ambient:
+    radial-gradient(900px 480px at 8% -10%, var(--wash-glow-clay), transparent 62%),
+    radial-gradient(760px 420px at 92% -4%, var(--wash-glow-moss), transparent 58%);
 }
 
 @layer base {
@@ -76,11 +94,10 @@
     font-size: 1rem;
     line-height: 1.6;
     color: var(--color-mute);
-    background:
-      radial-gradient(900px 480px at 8% -10%, rgb(193 96 60 / 0.05), transparent 62%),
-      radial-gradient(760px 420px at 92% -4%, rgb(21 122 88 / 0.04), transparent 58%),
-      var(--color-paper);
+    background-color: var(--color-paper);
+    background-image: var(--wash-ambient);
     background-attachment: fixed;
+    background-repeat: no-repeat;
     min-height: 100dvh;
   }
 
@@ -127,6 +144,12 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #c2bcab;
     background-clip: content-box;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: #4a463f;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: #5b564c;
   }
 }
 

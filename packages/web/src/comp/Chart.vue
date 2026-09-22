@@ -10,6 +10,7 @@ import {
 } from 'lightweight-charts'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { DASH, rate } from '../lib/fmt'
+import { dark } from '../lib/theme'
 import {
   bestSeries,
   cbslSeries,
@@ -32,9 +33,33 @@ let ref_: ISeriesApi<'Line'> | null = null
 const lines = new Map<string, ISeriesApi<'Line'>>()
 
 const TONE = {
-  buy: { line: '#b3541d', top: 'rgba(179,84,29,0.20)', bot: 'rgba(179,84,29,0.01)' },
-  sell: { line: '#157a58', top: 'rgba(21,122,88,0.20)', bot: 'rgba(21,122,88,0.01)' },
+  light: {
+    buy: { line: '#b3541d', top: 'rgba(179,84,29,0.20)', bot: 'rgba(179,84,29,0.01)' },
+    sell: { line: '#157a58', top: 'rgba(21,122,88,0.20)', bot: 'rgba(21,122,88,0.01)' },
+  },
+  dark: {
+    buy: { line: '#e7966e', top: 'rgba(231,150,110,0.22)', bot: 'rgba(231,150,110,0.01)' },
+    sell: { line: '#6cc4a1', top: 'rgba(108,196,161,0.22)', bot: 'rgba(108,196,161,0.01)' },
+  },
 } as const
+
+const SKIN = {
+  light: {
+    text: '#94907f',
+    grid: 'rgba(28,27,23,0.06)',
+    cross: 'rgba(28,27,23,0.28)',
+    ref: 'rgba(102,98,79,0.55)',
+  },
+  dark: {
+    text: '#948e80',
+    grid: 'rgba(244,242,236,0.09)',
+    cross: 'rgba(244,242,236,0.30)',
+    ref: 'rgba(205,200,187,0.45)',
+  },
+} as const
+
+const skin = () => (dark.value ? SKIN.dark : SKIN.light)
+const tone = () => TONE[dark.value ? 'dark' : 'light'][mode.value]
 
 function toPoints(s: { ts: number[]; vals: (number | null)[] }) {
   const out: { time: UTCTimestamp; value: number }[] = []
@@ -67,8 +92,21 @@ const lede = computed(() => {
 
 function paint() {
   if (!area) return
-  const t = TONE[mode.value]
+  const t = tone()
   area.applyOptions({ lineColor: t.line, topColor: t.top, bottomColor: t.bot })
+}
+
+/** Repaints the chrome (axis, grid, crosshair, reference line) for the theme. */
+function reskin() {
+  if (!chart) return
+  const s = skin()
+  chart.applyOptions({
+    layout: { textColor: s.text },
+    grid: { horzLines: { color: s.grid } },
+    crosshair: { vertLine: { color: s.cross }, horzLine: { color: s.cross } },
+  })
+  ref_?.applyOptions({ color: s.ref })
+  paint()
 }
 
 function sync() {
@@ -110,23 +148,24 @@ function draw() {
 onMounted(() => {
   if (!host.value) return
 
+  const s = skin()
   chart = createChart(host.value, {
     autoSize: true,
     layout: {
       background: { color: 'transparent' },
-      textColor: '#94907f',
+      textColor: s.text,
       fontFamily: "'JetBrains Mono', ui-monospace, monospace",
       attributionLogo: false,
     },
     grid: {
       vertLines: { visible: false },
-      horzLines: { color: 'rgba(28,27,23,0.06)', style: LineStyle.Solid },
+      horzLines: { color: s.grid, style: LineStyle.Solid },
     },
     rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.18, bottom: 0.12 } },
     timeScale: { borderVisible: false, fixLeftEdge: true, fixRightEdge: true },
     crosshair: {
-      vertLine: { color: 'rgba(28,27,23,0.28)', width: 1, style: LineStyle.Dashed, labelVisible: false },
-      horzLine: { color: 'rgba(28,27,23,0.28)', width: 1, style: LineStyle.Dashed },
+      vertLine: { color: s.cross, width: 1, style: LineStyle.Dashed, labelVisible: false },
+      horzLine: { color: s.cross, width: 1, style: LineStyle.Dashed },
     },
     handleScale: false,
     handleScroll: false,
@@ -140,7 +179,7 @@ onMounted(() => {
   })
 
   ref_ = chart.addSeries(LineSeries, {
-    color: 'rgba(102,98,79,0.55)',
+    color: s.ref,
     lineWidth: 1,
     lineStyle: LineStyle.Dashed,
     priceLineVisible: false,
@@ -164,6 +203,7 @@ onBeforeUnmount(() => {
 watch([data, refData], draw)
 watch(picked, sync)
 watch(mode, paint)
+watch(dark, reskin)
 </script>
 
 <template>

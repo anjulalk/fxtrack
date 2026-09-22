@@ -12,6 +12,22 @@
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
     <meta name="author" content="Anjula Karunarathne" />
     <meta name="theme-color" content="#faf9f6" />
+    <!-- Set the appearance before first paint so the dark theme never flashes. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('fxtrack.appearance')
+          var dark =
+            stored === 'dark' ||
+            (stored !== 'light' &&
+              window.matchMedia &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches)
+          if (dark) document.documentElement.classList.add('dark')
+          var meta = document.querySelector('meta[name="theme-color"]')
+          if (meta) meta.setAttribute('content', dark ? '#282622' : '#faf9f6')
+        } catch (e) {}
+      })()
+    </script>
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="fxtrack" />

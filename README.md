@@ -14,9 +14,10 @@ npm run dev
 ## Design system
 
 The interface follows the same design system as [anjula.dev](https://anjula.dev): paper surfaces,
-ink text, one clay accent, Inter for chrome and Source Serif 4 for prose. The tokens are published
-at <https://anjula.dev/design/tokens.css> and documented in that project's `DESIGN.md`; this app
-mirrors them in `packages/web/src/style.css`.
+ink text, one clay accent, Inter for chrome and Source Serif 4 for prose. The page carries the shared
+ambient wash (two soft clay and moss glows, `--wash-ambient`), and the wordmark is two tones, `fx` in
+ink and `track` in clay. The tokens are published at <https://anjula.dev/design/tokens.css> and
+documented in that project's `DESIGN.md`; this app mirrors them in `packages/web/src/style.css`.
 
 ## Deploy
 
