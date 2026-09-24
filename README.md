@@ -1,6 +1,7 @@
 # fxtrack
 
 [![ci](https://img.shields.io/github/actions/workflow/status/anjulalk/fxtrack/ci.yml?branch=main&label=ci&labelColor=44403a&style=flat-square)](https://github.com/anjulalk/fxtrack/actions/workflows/ci.yml)
+[![release](https://img.shields.io/github/v/release/anjulalk/fxtrack?label=release&labelColor=44403a&color=5f5a51&style=flat-square)](https://github.com/anjulalk/fxtrack/releases/latest)
 [![deploy](https://img.shields.io/github/actions/workflow/status/anjulalk/fxtrack/deploy.yml?branch=main&label=deploy&labelColor=44403a&style=flat-square)](https://github.com/anjulalk/fxtrack/actions/workflows/deploy.yml)
 [![node](https://img.shields.io/badge/node-24-5f5a51?labelColor=44403a&style=flat-square)](https://nodejs.org/)
 [![license](https://img.shields.io/badge/license-MIT-c1603c?labelColor=44403a&style=flat-square)](LICENSE)
@@ -35,6 +36,10 @@ BASE_PATH=/ SITE_URL=https://fxtrack.anjula.dev npm run build
 
 `SITE_URL` only affects the generated `sitemap.xml`; the canonical and social tags in
 `packages/web/index.html` carry the same origin and must be changed together.
+
+## Releases
+
+The live site deploys from `main`. Merge a pull request labeled `release:patch`, `release:minor` or `release:major` to update `VERSION`, create a Git tag and publish a GitHub release. You can also dispatch the `release.yml` workflow with a version bump.
 
 ## Attribution
 
