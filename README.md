@@ -1,9 +1,9 @@
 # fxtrack
 
-[![CI](https://github.com/anjulalk/fxtrack/actions/workflows/ci.yml/badge.svg)](https://github.com/anjulalk/fxtrack/actions/workflows/ci.yml)
-[![Deploy](https://github.com/anjulalk/fxtrack/actions/workflows/deploy.yml/badge.svg)](https://github.com/anjulalk/fxtrack/actions/workflows/deploy.yml)
-[![Node 24](https://img.shields.io/badge/node-24-5f5a51)](https://nodejs.org/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-c1603c)](LICENSE)
+[![ci](https://img.shields.io/github/actions/workflow/status/anjulalk/fxtrack/ci.yml?branch=main&label=ci&labelColor=44403a&style=flat-square)](https://github.com/anjulalk/fxtrack/actions/workflows/ci.yml)
+[![deploy](https://img.shields.io/github/actions/workflow/status/anjulalk/fxtrack/deploy.yml?branch=main&label=deploy&labelColor=44403a&style=flat-square)](https://github.com/anjulalk/fxtrack/actions/workflows/deploy.yml)
+[![node](https://img.shields.io/badge/node-24-5f5a51?labelColor=44403a&style=flat-square)](https://nodejs.org/)
+[![license](https://img.shields.io/badge/license-MIT-c1603c?labelColor=44403a&style=flat-square)](LICENSE)
 
 **fxtrack** is an independent USD/LKR bank-rate tracker for Sri Lanka, built by [Anjula Karunarathne](https://anjula.dev).
 
