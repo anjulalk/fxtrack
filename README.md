@@ -10,6 +10,14 @@
 
 It compares published buying and selling rates from Sri Lankan banks, keeps historical snapshots, and presents the results in a focused interface. Rates are sourced from official bank and Central Bank of Sri Lanka pages.
 
+## Screenshots
+
+> The screenshots below are deterministic demo captures. All bank names, rates, timestamps, and history points are synthetic; they are not live bank or Central Bank data.
+
+![fxtrack demo rate board comparing six synthetic USD/LKR bank quotes, with best and selected banks and one-month statistics](docs/board.png)
+
+![fxtrack demo history chart showing a deterministic one-month USD/LKR trend, two selected synthetic bank lines, and a dashed synthetic central-bank reference](docs/history.png)
+
 ## Development
 
 ```bash
