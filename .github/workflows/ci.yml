@@ -1,0 +1,50 @@
+name: ci
+
+# The deploy workflow runs on main and owns the live site. This one answers the
+# question a pull request asks: does it still check, and does it still build.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check
+        run: npm run check
+
+      - name: Build
+        env:
+          # Served from the root of the custom subdomain (see public/CNAME).
+          BASE_PATH: /
+          SITE_URL: https://fxtrack.anjula.dev
+        run: npm run build
+
+      # Pages serves one deployment and that one belongs to main, so a pull
+      # request gets the built site as a downloadable artifact instead.
+      - name: Attach the built site to the run
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: packages/web/dist
+          retention-days: 7
