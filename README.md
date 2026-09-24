@@ -47,7 +47,7 @@ BASE_PATH=/ SITE_URL=https://fxtrack.anjula.dev npm run build
 
 ## Releases
 
-The live site deploys from `main`. Merge a pull request labeled `release:patch`, `release:minor` or `release:major` to update `VERSION`, create a Git tag and publish a GitHub release. You can also dispatch the `release.yml` workflow with a version bump.
+The live site deploys from `main`. Merge a pull request labeled `release:patch`, `release:minor` or `release:major` to update `VERSION`, create a Git tag and publish a GitHub release. Minor and patch Dependabot updates merge automatically after checks and dispatch matching minor or patch releases. Security updates also merge and dispatch a patch release; major updates wait for review. You can also dispatch the `release.yml` workflow with a version bump.
 
 ## Attribution
 
