@@ -1,5 +1,10 @@
 # fxtrack
 
+[![CI](https://github.com/anjulalk/fxtrack/actions/workflows/ci.yml/badge.svg)](https://github.com/anjulalk/fxtrack/actions/workflows/ci.yml)
+[![Deploy](https://github.com/anjulalk/fxtrack/actions/workflows/deploy.yml/badge.svg)](https://github.com/anjulalk/fxtrack/actions/workflows/deploy.yml)
+[![Node 24](https://img.shields.io/badge/node-24-5f5a51)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-c1603c)](LICENSE)
+
 **fxtrack** is an independent USD/LKR bank-rate tracker for Sri Lanka, built by [Anjula Karunarathne](https://anjula.dev).
 
 It compares published buying and selling rates from Sri Lankan banks, keeps historical snapshots, and presents the results in a focused interface. Rates are sourced from official bank and Central Bank of Sri Lanka pages.
