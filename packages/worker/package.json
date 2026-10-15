@@ -15,7 +15,7 @@
     "@fxtrack/shared": "*"
   },
   "devDependencies": {
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "esbuild": "^0.28.2"
   }
 }
